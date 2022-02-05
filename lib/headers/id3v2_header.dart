@@ -2,48 +2,76 @@ import 'dart:convert';
 
 import 'dart:typed_data';
 
-import 'package:zooper_flutter_id3/exceptions/id3_exception.dart';
 import 'package:zooper_flutter_id3/exceptions/tag_not_found_exception.dart';
 import 'package:zooper_flutter_id3/headers/id3_header.dart';
+import 'package:zooper_flutter_id3/helpers/size_calculator.dart';
 
 class Id3v2Header extends Id3Header {
   static const int majorSize = 1;
   static const int minorSize = 1;
 
-  Id3v2Header(Uint8List bytes, int startIndex) {
+  Id3v2Header(List<int> bytes, int startIndex) {
     if (isValidHeader(bytes, startIndex) == false) {
       throw TagNotFoundException(identifier);
     }
 
-    majorVersion = readMajorVersion(bytes);
-    revisionVersion = readRevisionVersion(bytes);
+    majorVersion = _readMajorVersion(bytes);
+    _revisionVersion = _readRevisionVersion(bytes);
+
+    _flags = _readFlags(bytes);
+
+    _size = _calculateSize(bytes);
   }
 
   @override
   String get identifier => 'ID3';
 
+  @override
   String get version => '2.$majorVersion.$revisionVersion';
 
+  late int _revisionVersion;
+  int get revisionVersion => _revisionVersion;
+
+  late int _flags;
+  int get flags => _flags;
+
+  bool get useUnsynchronization => flags & 0x80 != 0;
+  bool get hasExtendedHeader => flags & 0x40 != 0;
+  bool get isExperimental => flags & 0x20 != 0;
+
+  late int _size;
+  int get size => _size;
+
   String readIdentifier(Uint8List bytes) {
-    var identifierBytes = _getBytes(bytes, 0, identifier.length);
+    var identifierBytes = _sublist(bytes, 0, identifier.length);
     var readIdentifier = latin1.decode(identifierBytes);
 
     if (readIdentifier.toLowerCase() != identifier.toLowerCase()) {
-      throw Id3Exception('File does not have an ID3v2 header');
+      throw TagNotFoundException(identifier);
     }
 
     return identifier;
   }
 
-  int readMajorVersion(Uint8List bytes) {
+  int _readMajorVersion(List<int> bytes) {
     return bytes[3];
   }
 
-  int readRevisionVersion(Uint8List bytes) {
+  int _readRevisionVersion(List<int> bytes) {
     return bytes[4];
   }
 
-  Uint8List _getBytes(Uint8List bytes, int start, int length) {
+  int _readFlags(List<int> bytes) {
+    return bytes[5];
+  }
+
+  int _calculateSize(List<int> bytes) {
+    return revisionVersion >= 4
+        ? SizeCalculator.sizeOfSyncSafe(bytes.sublist(6, 10))
+        : SizeCalculator.sizeOf(bytes.sublist(6, 10));
+  }
+
+  List<int> _sublist(List<int> bytes, int start, int length) {
     return bytes.sublist(start, start + length);
   }
 

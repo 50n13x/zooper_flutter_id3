@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  convert: 3.0.1
+
   file_picker: ^4.3.3
 
   utf_convert: ^0.10.0+1

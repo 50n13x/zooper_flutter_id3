@@ -9,6 +9,7 @@ import 'package:zooper_flutter_id3/zooper_audiofile.dart';
 void main() {
   const String file1 = 'C:/Users/Danie/Desktop/1.mp3';
   const String file2 = 'C:/Users/Danie/Desktop/2.mp3';
+  const String file3 = 'C:/Users/Danie/Desktop/3.mp3';
 
   test('Loading file', () async {
     //var filePath = await _pickFile();

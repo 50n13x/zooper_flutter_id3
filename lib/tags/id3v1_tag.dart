@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:zooper_flutter_id3/enums/frame_name.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifier.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifiers.dart';
@@ -9,21 +7,22 @@ import 'package:zooper_flutter_id3/headers/id3v1_header.dart';
 import 'package:zooper_flutter_id3/tags/id3_tag.dart';
 
 class Id3v1Tag extends Id3Tag<Id3v1Frame> {
-  factory Id3v1Tag.load(Uint8List bytes) {
+  factory Id3v1Tag.load(List<int> bytes) {
     var header = Id3v1Header(bytes, bytes.length - 128);
 
     return Id3v1Tag._internal(header, bytes);
   }
 
-  Id3v1Tag._internal(Id3Header header, Uint8List bytes) : super(header) {
-    load(bytes);
+  Id3v1Tag._internal(Id3Header header, List<int> bytes) : super(header) {
+    load(header, bytes);
   }
 
-  void load(Uint8List bytes) {
+  void load(Id3Header header, List<int> bytes) {
     int startIndex = bytes.length - 128 + header.identifier.length;
 
     // Title
     startIndex += _loadFrame(
+      header,
       frameIdentifiers.firstWhere((element) => element.frameName == FrameName.title),
       bytes,
       startIndex,
@@ -31,6 +30,7 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
 
     // Artist
     startIndex += _loadFrame<String>(
+      header,
       frameIdentifiers.firstWhere((element) => element.frameName == FrameName.artist),
       bytes,
       startIndex,
@@ -38,6 +38,7 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
 
     // Album
     startIndex += _loadFrame<String>(
+      header,
       frameIdentifiers.firstWhere((element) => element.frameName == FrameName.album),
       bytes,
       startIndex,
@@ -45,6 +46,7 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
 
     // Year
     startIndex += _loadFrame<String>(
+      header,
       frameIdentifiers.firstWhere((element) => element.frameName == FrameName.year),
       bytes,
       startIndex,
@@ -52,6 +54,7 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
 
     // Comment
     startIndex += _loadFrame<String>(
+      header,
       frameIdentifiers.firstWhere((element) => element.frameName == FrameName.comment),
       bytes,
       startIndex,
@@ -59,6 +62,7 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
 
     // Genre
     startIndex += _loadFrame<int>(
+      header,
       frameIdentifiers.firstWhere((element) => element.frameName == FrameName.genre),
       bytes,
       startIndex,
@@ -70,9 +74,9 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
     return true;
   }
 
-  int _loadFrame<T>(FrameIdentifier identifier, List<int> bytes, int startIndex) {
-    var frame = Id3v1Frame<T>(identifier);
-    int size = frame.load(bytes, startIndex);
+  int _loadFrame<T>(Id3Header header, FrameIdentifier identifier, List<int> bytes, int startIndex) {
+    var frame = Id3v1Frame<T>(header, identifier);
+    int size = frame.decode(bytes, startIndex);
     addFrame(frame);
     return size;
   }

@@ -2,16 +2,17 @@ import 'dart:convert';
 
 import 'package:zooper_flutter_id3/exceptions/unsupported_type_exception.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifier.dart';
+import 'package:zooper_flutter_id3/headers/id3_header.dart';
 
 import 'id3_frame.dart';
 
 class Id3v1Frame<T> extends Id3Frame {
   late T value;
 
-  Id3v1Frame(FrameIdentifier identifier) : super(identifier);
+  Id3v1Frame(Id3Header header, FrameIdentifier identifier) : super.fromIdentifier(header, identifier);
 
   @override
-  int load(List<int> bytes, int startIndex) {
+  int decode(List<int> bytes, int startIndex) {
     var subBytes = _clearZeros(bytes.sublist(startIndex, startIndex + identifier.v11Length));
 
     switch (T) {
@@ -27,7 +28,7 @@ class Id3v1Frame<T> extends Id3Frame {
   }
 
   @override
-  List<int> toByteList() {
+  List<int> encode() {
     if (T is String) {
       return _filledArray(value as String);
     }
