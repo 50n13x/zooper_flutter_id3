@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:collection/src/iterable_extensions.dart';
 import 'package:zooper_flutter_id3/exceptions/id3_exception.dart';
 import 'package:zooper_flutter_id3/exceptions/unsupported_frame_exception.dart';
 import 'package:zooper_flutter_id3/exceptions/unsupported_version_exception.dart';
@@ -38,25 +39,31 @@ abstract class Id3v2FrameHeader {
 
   void load(List<int> bytes, int startIndex);
 
-  void loadFrameIdentifier(List<int> bytes, int startIndex) {
+  FrameIdentifier loadFrameIdentifier(List<int> bytes, int startIndex) {
     var identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + identifierFieldSize));
+
+    FrameIdentifier? frameIdentifier;
 
     switch (id3v2Header.majorVersion) {
       case 4:
-        _frameIdentifier = frameIdentifiers.firstWhere((element) => element.v24Name == identifierId);
+        frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v24Name == identifierId);
         break;
       case 3:
-        _frameIdentifier = frameIdentifiers.firstWhere((element) => element.v23Name == identifierId);
+        frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v23Name == identifierId);
         break;
       case 2:
-        _frameIdentifier = frameIdentifiers.firstWhere((element) => element.v22Name == identifierId);
+        frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v22Name == identifierId);
         break;
-      default:
-        throw UnsupportedFrameException(identifierId);
     }
+
+    if (frameIdentifier == null) {
+      throw UnsupportedFrameException(identifierId);
+    }
+
+    return frameIdentifier;
   }
 
-  void loadFrameSize(List<int> bytes, int startIndex) {
+  int loadFrameSize(List<int> bytes, int startIndex) {
     final size = id3v2Header.majorVersion == 4
         ? SizeCalculator.sizeOfSyncSafe(bytes.sublist(startIndex, startIndex + 4))
         : id3v2Header.majorVersion == 3
@@ -68,7 +75,12 @@ abstract class Id3v2FrameHeader {
       throw Id3Exception('The calculated size is invalid');
     }
 
-    _contentSize = size;
+    return size;
+  }
+
+  @override
+  String toString() {
+    return '${frameIdentifier.frameName.name} | ${frameIdentifier.v24Name ?? frameIdentifier.v23Name ?? frameIdentifier.v22Name}';
   }
 }
 
@@ -99,13 +111,13 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
 
   @override
   void load(List<int> bytes, int startIndex) {
-    loadFrameIdentifier(bytes, startIndex);
-    loadFrameSize(bytes, startIndex + identifierFieldSize);
-    _loadFlags(bytes, startIndex + identifierFieldSize + sizeFieldSize);
+    _frameIdentifier = loadFrameIdentifier(bytes, startIndex);
+    _contentSize = loadFrameSize(bytes, startIndex + identifierFieldSize);
+    _flags = _loadFlags(bytes, startIndex + identifierFieldSize + sizeFieldSize);
   }
 
-  void _loadFlags(List<int> bytes, int startIndex) {
-    _flags = bytes.sublist(startIndex, startIndex + flagsFieldSize);
+  List<int> _loadFlags(List<int> bytes, int startIndex) {
+    return bytes.sublist(startIndex, startIndex + flagsFieldSize);
   }
 }
 
@@ -127,7 +139,7 @@ class Id3v22FrameHeader extends Id3v2FrameHeader {
 
   @override
   void load(List<int> bytes, int startIndex) {
-    loadFrameIdentifier(bytes, startIndex);
-    loadFrameSize(bytes, startIndex + identifierFieldSize);
+    _frameIdentifier = loadFrameIdentifier(bytes, startIndex);
+    _contentSize = loadFrameSize(bytes, startIndex + identifierFieldSize);
   }
 }

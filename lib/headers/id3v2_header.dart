@@ -10,6 +10,10 @@ class Id3v2Header extends Id3Header {
   static const int majorSize = 1;
   static const int minorSize = 1;
 
+  late int _revisionVersion;
+  late int _flags;
+  late int _size;
+
   Id3v2Header(List<int> bytes, int startIndex) {
     if (isValidHeader(bytes, startIndex) == false) {
       throw TagNotFoundException(identifier);
@@ -29,17 +33,15 @@ class Id3v2Header extends Id3Header {
   @override
   String get version => '2.$majorVersion.$revisionVersion';
 
-  late int _revisionVersion;
   int get revisionVersion => _revisionVersion;
 
-  late int _flags;
   int get flags => _flags;
 
   bool get useUnsynchronization => flags & 0x80 != 0;
   bool get hasExtendedHeader => flags & 0x40 != 0;
   bool get isExperimental => flags & 0x20 != 0;
 
-  late int _size;
+  /// The size of the whole ID3v2 Tag
   int get size => _size;
 
   String readIdentifier(Uint8List bytes) {

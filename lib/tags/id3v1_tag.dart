@@ -7,8 +7,10 @@ import 'package:zooper_flutter_id3/headers/id3v1_header.dart';
 import 'package:zooper_flutter_id3/tags/id3_tag.dart';
 
 class Id3v1Tag extends Id3Tag<Id3v1Frame> {
-  factory Id3v1Tag.load(List<int> bytes) {
-    var header = Id3v1Header(bytes, bytes.length - 128);
+  static const int tagLength = 128;
+
+  factory Id3v1Tag.decode(List<int> bytes) {
+    var header = Id3v1Header(bytes, bytes.length - tagLength);
 
     return Id3v1Tag._internal(header, bytes);
   }
@@ -18,7 +20,7 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
   }
 
   void load(Id3Header header, List<int> bytes) {
-    int startIndex = bytes.length - 128 + header.identifier.length;
+    int startIndex = bytes.length - tagLength + header.identifier.length;
 
     // Title
     startIndex += _loadFrame(
@@ -63,7 +65,7 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
     // Genre
     startIndex += _loadFrame<int>(
       header,
-      frameIdentifiers.firstWhere((element) => element.frameName == FrameName.genre),
+      frameIdentifiers.firstWhere((element) => element.frameName == FrameName.contentType),
       bytes,
       startIndex,
     );

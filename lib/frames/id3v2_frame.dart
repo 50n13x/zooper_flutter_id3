@@ -21,13 +21,25 @@ class Id3v2Frame extends Id3Frame {
   late Id3v2FrameHeader _id3v2frameHeader;
   Id3v2FrameHeader get id3v2FrameHeader => _id3v2frameHeader;
 
+  late FrameContent _content;
+  FrameContent get content => _content;
+
+  /// The total framesize inclusive header
   int get frameSize => 10 + _id3v2frameHeader.contentSize;
 
   @override
   void decode(List<int> bytes, int startIndex) {
-    _loadFrameHeader(bytes, startIndex);
-    _loadFrameContent(
-        header, id3v2FrameHeader, bytes, startIndex + _id3v2frameHeader.headerSize, id3v2FrameHeader.contentSize);
+    _id3v2frameHeader = _loadFrameHeader(bytes, startIndex);
+    // TODO: abstract this into super class
+    identifier = _id3v2frameHeader.frameIdentifier;
+
+    _content = _loadFrameContent(
+      header,
+      id3v2FrameHeader,
+      bytes,
+      startIndex + _id3v2frameHeader.headerSize,
+      id3v2FrameHeader.contentSize,
+    );
   }
 
   @override
@@ -36,12 +48,12 @@ class Id3v2Frame extends Id3Frame {
     throw UnimplementedError();
   }
 
-  void _loadFrameHeader(List<int> bytes, int startIndex) {
-    _id3v2frameHeader = Id3v2FrameHeader.load(header as Id3v2Header, bytes, startIndex);
-    identifier = _id3v2frameHeader.frameIdentifier;
+  Id3v2FrameHeader _loadFrameHeader(List<int> bytes, int startIndex) {
+    return Id3v2FrameHeader.load(header as Id3v2Header, bytes, startIndex);
   }
 
-  void _loadFrameContent(Id3Header header, Id3v2FrameHeader frameHeader, List<int> bytes, int startIndex, int size) {
-    var content = FrameContent.decode(header, frameHeader, bytes, startIndex, size);
+  FrameContent _loadFrameContent(
+      Id3Header header, Id3v2FrameHeader frameHeader, List<int> bytes, int startIndex, int size) {
+    return FrameContent.decode(header, frameHeader, bytes, startIndex, size);
   }
 }

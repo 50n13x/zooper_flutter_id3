@@ -14,11 +14,13 @@ void main() {
   test('Loading file', () async {
     //var filePath = await _pickFile();
 
-    final bytes = await _loadBytesAsync(file2);
+    final bytes = await _loadBytesAsync(file3);
 
     final ZooperAudioFile audioFile = ZooperAudioFile.load(bytes);
 
     debugPrint(audioFile.toString());
+
+    await saveFileAsync(audioFile.audioData);
   });
 }
 
@@ -27,6 +29,11 @@ Future<Uint8List> _loadBytesAsync(String filePath) async {
   Uint8List bytes = await file.readAsBytes();
 
   return bytes;
+}
+
+Future<void> saveFileAsync(List<int> bytes) async {
+  File file = File('C:/Users/Danie/Desktop/test.mp3');
+  await file.writeAsBytes(bytes);
 }
 
 Future<File> _pickFile() async {
