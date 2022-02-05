@@ -14,7 +14,7 @@ import 'text_frame_content.dart';
 abstract class FrameContent {
   factory FrameContent.decode(
       Id3Header header, Id3v2FrameHeader frameHeader, List<int> bytes, int startIndex, int size) {
-    switch (frameHeader.frameIdentifier.frameName) {
+    switch (frameHeader.identifier.frameName) {
       case FrameName.picture:
         return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size);
       case FrameName.comment:

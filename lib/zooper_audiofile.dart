@@ -6,7 +6,7 @@ class ZooperAudioFile {
   Id3v2Tag? _id3v2tag;
   late List<int> _audioData;
 
-  ZooperAudioFile.load(List<int> bytes) {
+  ZooperAudioFile.decode(List<int> bytes) {
     _id3v1tag = _decodeV1Tag(bytes);
     _id3v2tag = _decodeV2Tag(bytes);
     _audioData = _getAudioData(bytes, _id3v1tag, _id3v2tag);
@@ -20,7 +20,7 @@ class ZooperAudioFile {
     try {
       return Id3v1Tag.decode(bytes);
     } catch (exception) {
-      print(exception);
+      return null;
     }
   }
 
@@ -28,7 +28,7 @@ class ZooperAudioFile {
     try {
       return Id3v2Tag.decode(bytes, 0);
     } catch (exception) {
-      print(exception);
+      return null;
     }
   }
 

@@ -12,14 +12,14 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
   factory Id3v1Tag.decode(List<int> bytes) {
     var header = Id3v1Header(bytes, bytes.length - tagLength);
 
-    return Id3v1Tag._internal(header, bytes);
+    return Id3v1Tag._decode(header, bytes);
   }
 
-  Id3v1Tag._internal(Id3Header header, List<int> bytes) : super(header) {
-    load(header, bytes);
+  Id3v1Tag._decode(Id3Header header, List<int> bytes) : super(header) {
+    _decode(header, bytes);
   }
 
-  void load(Id3Header header, List<int> bytes) {
+  void _decode(Id3Header header, List<int> bytes) {
     int startIndex = bytes.length - tagLength + header.identifier.length;
 
     // Title
@@ -77,14 +77,13 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
   }
 
   int _loadFrame<T>(Id3Header header, FrameIdentifier identifier, List<int> bytes, int startIndex) {
-    var frame = Id3v1Frame<T>(header, identifier);
-    int size = frame.decode(bytes, startIndex);
+    var frame = Id3v1Frame<T>.decode(header, bytes, startIndex, identifier);
     addFrame(frame);
-    return size;
+    return identifier.v11Length;
   }
 
   @override
-  List<int> toByteList() {
+  List<int> encode() {
     // TODO: implement toByteList
     throw UnimplementedError();
   }

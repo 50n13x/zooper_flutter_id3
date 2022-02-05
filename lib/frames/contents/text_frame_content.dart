@@ -15,13 +15,13 @@ abstract class TextFrameContent extends FrameContent {
     int size,
   ) {
     if (header.majorVersion == 4) {
-      return _Id3v24TextFrameContent(header, frameHeader, bytes, startIndex, size);
+      return _Id3v24TextFrameContent.decode(header, frameHeader, bytes, startIndex, size);
     }
 
-    return _DefaultTextFrameContent(header, frameHeader, bytes, startIndex, size);
+    return _DefaultTextFrameContent.decode(header, frameHeader, bytes, startIndex, size);
   }
 
-  TextFrameContent._internal(
+  TextFrameContent._decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
     List<int> bytes,
@@ -63,21 +63,21 @@ abstract class TextFrameContent extends FrameContent {
 }
 
 class _DefaultTextFrameContent extends TextFrameContent {
-  _DefaultTextFrameContent(
+  _DefaultTextFrameContent.decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
     List<int> bytes,
     int startIndex,
     int size,
-  ) : super._internal(header, frameHeader, bytes, startIndex, size);
+  ) : super._decode(header, frameHeader, bytes, startIndex, size);
 }
 
 class _Id3v24TextFrameContent extends TextFrameContent {
-  _Id3v24TextFrameContent(
+  _Id3v24TextFrameContent.decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
     List<int> bytes,
     int startIndex,
     int size,
-  ) : super._internal(header, frameHeader, bytes, startIndex, size);
+  ) : super._decode(header, frameHeader, bytes, startIndex, size);
 }

@@ -10,13 +10,14 @@ void main() {
   const String file1 = 'C:/Users/Danie/Desktop/1.mp3';
   const String file2 = 'C:/Users/Danie/Desktop/2.mp3';
   const String file3 = 'C:/Users/Danie/Desktop/3.mp3';
+  const String file4 = 'C:/Users/Danie/Desktop/4.mp4';
 
   test('Loading file', () async {
     //var filePath = await _pickFile();
 
-    final bytes = await _loadBytesAsync(file3);
+    final bytes = await _loadBytesAsync(file2);
 
-    final ZooperAudioFile audioFile = ZooperAudioFile.load(bytes);
+    final ZooperAudioFile audioFile = ZooperAudioFile.decode(bytes);
 
     debugPrint(audioFile.toString());
 

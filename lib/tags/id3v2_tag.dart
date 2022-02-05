@@ -19,15 +19,15 @@ abstract class Id3v2Tag extends Id3Tag {
       return Id3v24Tag(header, bytes, startIndex, header.size);
     } else if (header.majorVersion == 3) {
       return Id3v23Tag(header, bytes, startIndex, header.size);
+    } else if (header.majorVersion == 2) {
+      return Id3v22Tag(header, bytes, startIndex, header.size);
     }
-
-    // TODO implement other versions
 
     throw UnsupportedVersionException(header.version);
   }
 
-  Id3v2Tag(Id3Header header, List<int> bytes, int startIndex, int size) : super(header) {
-    decode(bytes, 10, size);
+  Id3v2Tag._decode(Id3Header header, List<int> bytes, int startIndex, int size) : super(header) {
+    _decode(bytes, 10, size);
   }
 
   /// Returns the full size of the v2 tag
@@ -36,7 +36,7 @@ abstract class Id3v2Tag extends Id3Tag {
   /// this is needed in order to extract ALL audio data
   int get fullSize => _fullSize;
 
-  void decode(List<int> bytes, int startIndex, int size) {
+  void _decode(List<int> bytes, int startIndex, int size) {
     bool hasNextFrame = true;
 
     var start = startIndex;
@@ -48,8 +48,6 @@ abstract class Id3v2Tag extends Id3Tag {
         hasNextFrame = false;
         break;
       }
-
-      print('Frame: ${frame.id3v2FrameHeader}');
 
       frames.add(frame);
 
@@ -81,16 +79,15 @@ class Id3v24Tag extends Id3v2Tag {
     List<int> bytes,
     int startIndex,
     int size,
-  ) : super(header, bytes, startIndex, size);
+  ) : super._decode(header, bytes, startIndex, size);
 
   @override
   bool isFrameSupported(Id3Frame frame) {
-    // TODO: implement isFrameSupported
-    throw UnimplementedError();
+    return frame.frameHeader.identifier.v24Name != null;
   }
 
   @override
-  List<int> toByteList() {
+  List<int> encode() {
     // TODO: implement toByteList
     throw UnimplementedError();
   }
@@ -102,16 +99,35 @@ class Id3v23Tag extends Id3v2Tag {
     List<int> bytes,
     int startIndex,
     int size,
-  ) : super(header, bytes, startIndex, size);
+  ) : super._decode(header, bytes, startIndex, size);
 
   @override
   bool isFrameSupported(Id3Frame frame) {
-    // TODO: implement isFrameSupported
-    throw UnimplementedError();
+    return frame.frameHeader.identifier.v23Name != null;
   }
 
   @override
-  List<int> toByteList() {
+  List<int> encode() {
+    // TODO: implement toByteList
+    throw UnimplementedError();
+  }
+}
+
+class Id3v22Tag extends Id3v2Tag {
+  Id3v22Tag(
+    Id3Header header,
+    List<int> bytes,
+    int startIndex,
+    int size,
+  ) : super._decode(header, bytes, startIndex, size);
+
+  @override
+  bool isFrameSupported(Id3Frame frame) {
+    return frame.frameHeader.identifier.v22Name != null;
+  }
+
+  @override
+  List<int> encode() {
     // TODO: implement toByteList
     throw UnimplementedError();
   }

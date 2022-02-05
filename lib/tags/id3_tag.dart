@@ -14,24 +14,25 @@ abstract class Id3Tag<T extends Id3Frame> {
 
   void addFrame(T frame) {
     if (isFrameSupported(frame) == false) {
-      throw UnsupportedFrameException(frame.identifier.frameName.name);
+      throw UnsupportedFrameException(frame.frameHeader.identifier.frameName.name);
     }
 
     if (frameExists(frame)) {
-      throw FramePresentException(frame.identifier.frameName.name);
+      throw FramePresentException(frame.frameHeader.identifier.frameName.name);
     }
 
     frames.add(frame);
   }
 
   bool frameExists(T frame) {
-    return frames.any((element) => element.identifier.frameName.name == frame.identifier.frameName.name);
+    return frames
+        .any((element) => element.frameHeader.identifier.frameName.name == frame.frameHeader.identifier.frameName.name);
   }
 
   T? getFrameByIdentifier(String identifier) =>
-      frames.firstWhereOrNull((element) => element.identifier.frameName.name == identifier);
+      frames.firstWhereOrNull((element) => element.frameHeader.identifier.frameName.name == identifier);
 
   bool isFrameSupported(T frame);
 
-  List<int> toByteList();
+  List<int> encode();
 }
