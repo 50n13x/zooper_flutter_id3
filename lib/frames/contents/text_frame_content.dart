@@ -73,11 +73,13 @@ class _DefaultTextFrameContent extends TextFrameContent {
 
   @override
   List<int> encode() {
-    return <int>[
+    var bytes = <int>[
       getIdFromEncoding(encoding),
       ...encoding.encode(value),
       ...Terminations.getByEncoding(encoding),
     ];
+
+    return bytes;
   }
 }
 

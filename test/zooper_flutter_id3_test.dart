@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -12,11 +14,12 @@ void main() {
   const String file3 = 'C:/Users/Danie/Desktop/3.mp3';
   const String file4 = 'C:/Users/Danie/Desktop/4.mp4';
   const String file5 = 'C:/Users/Danie/Desktop/5.mp3';
+  const String file6 = 'C:/Users/Danie/Desktop/6.mp3';
 
   test('Loading file', () async {
     //var filePath = await _pickFile();
 
-    final bytes = await _loadBytesAsync(file2);
+    final bytes = await _loadBytesAsync(file6);
 
     final ZooperAudioFile audioFile = ZooperAudioFile.decode(bytes);
 

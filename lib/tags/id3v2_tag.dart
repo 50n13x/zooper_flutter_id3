@@ -7,6 +7,7 @@ import 'package:zooper_flutter_id3/tags/id3_tag.dart';
 
 abstract class Id3v2Tag extends Id3Tag {
   late int _fullSize;
+  //late List<int> _padding;
 
   /// Decodes the Id3v2Tag
   factory Id3v2Tag.decode(
@@ -16,11 +17,11 @@ abstract class Id3v2Tag extends Id3Tag {
     var header = Id3v2Header(bytes, 0);
 
     if (header.majorVersion == 4) {
-      return Id3v24Tag(header, bytes, startIndex, header.size);
+      return Id3v24Tag(header, bytes, startIndex, header.frameSize);
     } else if (header.majorVersion == 3) {
-      return Id3v23Tag(header, bytes, startIndex, header.size);
+      return Id3v23Tag(header, bytes, startIndex, header.frameSize);
     } else if (header.majorVersion == 2) {
-      return Id3v22Tag(header, bytes, startIndex, header.size);
+      return Id3v22Tag(header, bytes, startIndex, header.frameSize);
     }
 
     throw UnsupportedVersionException(header.version);
@@ -59,8 +60,10 @@ abstract class Id3v2Tag extends Id3Tag {
     var indexOfPaddingEnd = _getIndexOfPaddingEnd(bytes, start);
     _fullSize = indexOfPaddingEnd;
 
+    //_padding = bytes.sublist(start, indexOfPaddingEnd);
+
     // TODO: Remove this, this is just a test
-    (header as Id3v2Header).size = start - header.headerSize;
+    //(header as Id3v2Header).size = start;
   }
 
   Id3v2Frame? _decodeFrame(Id3Header header, List<int> bytes, int start) {
@@ -77,8 +80,10 @@ abstract class Id3v2Tag extends Id3Tag {
 
   @override
   List<int> encode() {
-    var headerBytes = header.encode();
     var frameBytes = _encodeFrames();
+
+    (header as Id3v2Header).frameSize = frameBytes.length;
+    var headerBytes = header.encode();
 
     return <int>[
       ...headerBytes,

@@ -13,6 +13,16 @@ class SizeCalculator {
     return len;
   }
 
+  static int sizeOf3(List<int> block) {
+    assert(block.length == 3);
+
+    var len = block[0] << 16;
+    len += block[1] << 8;
+    len += block[2];
+
+    return len;
+  }
+
   // Sync safe 32bit int
   static int sizeOfSyncSafe(List<int> block) {
     assert(block.length == 4);
@@ -31,7 +41,7 @@ class SizeCalculator {
     final block = List<int>.filled(3, 0);
 
     block[0] = (value >> 16);
-    block[1] = (value >> 5);
+    block[1] = (value >> 8);
     block[2] = (value >> 0);
 
     return block;

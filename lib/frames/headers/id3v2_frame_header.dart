@@ -190,6 +190,8 @@ class Id3v22FrameHeader extends Id3v2FrameHeader {
 
   @override
   int decodeFrameSize(List<int> bytes, int startIndex) {
+    return SizeCalculator.sizeOf3(bytes.sublist(startIndex, startIndex + 3));
+
     return SizeCalculator.sizeOfSyncSafe([
       0,
       ...bytes.sublist(startIndex, startIndex + 2),

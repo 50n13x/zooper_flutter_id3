@@ -28,8 +28,8 @@ class Id3v2Header extends Id3Header {
   bool get hasExtendedHeader => flags & 0x40 != 0;
   bool get isExperimental => flags & 0x20 != 0;
 
-  /// The size of the whole ID3v2 Tag
-  late int size;
+  /// The size of all frames inclusive padding
+  late int frameSize;
 
   Id3v2Header(List<int> bytes, int startIndex) {
     if (isValidHeader(bytes, startIndex) == false) {
@@ -39,7 +39,7 @@ class Id3v2Header extends Id3Header {
     majorVersion = _decodeMajorVersion(bytes);
     _revisionVersion = _decodeRevisionVersion(bytes);
     _flags = _decodeFlags(bytes);
-    size = _decodeSize(bytes);
+    frameSize = _decodeSize(bytes);
   }
 
   String readIdentifier(Uint8List bytes) {
@@ -83,7 +83,7 @@ class Id3v2Header extends Id3Header {
       _encodeMajorVersion(majorVersion),
       ..._encodeRevisionVersion(revisionVersion),
       ..._encodeFlags(flags),
-      ..._encodeSize(size),
+      ..._encodeSize(frameSize),
     ];
   }
 
