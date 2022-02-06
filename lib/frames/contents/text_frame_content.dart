@@ -6,7 +6,7 @@ import 'package:zooper_flutter_id3/headers/id3_header.dart';
 
 import 'id3v2_frame_content.dart';
 
-abstract class TextFrameContent extends FrameContent {
+abstract class TextFrameContent extends Id3v2FrameContent {
   factory TextFrameContent.decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
@@ -70,6 +70,12 @@ class _DefaultTextFrameContent extends TextFrameContent {
     int startIndex,
     int size,
   ) : super._decode(header, frameHeader, bytes, startIndex, size);
+
+  @override
+  List<int> encode() {
+    // TODO: implement encode
+    throw UnimplementedError();
+  }
 }
 
 class _Id3v24TextFrameContent extends TextFrameContent {
@@ -80,4 +86,10 @@ class _Id3v24TextFrameContent extends TextFrameContent {
     int startIndex,
     int size,
   ) : super._decode(header, frameHeader, bytes, startIndex, size);
+
+  @override
+  List<int> encode() {
+    // TODO: implement encode
+    throw UnimplementedError();
+  }
 }

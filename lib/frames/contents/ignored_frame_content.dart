@@ -3,7 +3,7 @@ import 'package:zooper_flutter_id3/headers/id3_header.dart';
 
 import 'id3v2_frame_content.dart';
 
-class IgnoredFrameContent extends FrameContent {
+class IgnoredFrameContent extends Id3v2FrameContent {
   IgnoredFrameContent.decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
@@ -20,5 +20,10 @@ class IgnoredFrameContent extends FrameContent {
   @override
   void decode(List<int> bytes, int startIndex, int size) {
     _content = bytes.sublist(startIndex, startIndex + size);
+  }
+
+  @override
+  List<int> encode() {
+    return _content;
   }
 }

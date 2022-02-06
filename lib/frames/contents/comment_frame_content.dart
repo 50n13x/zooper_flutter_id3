@@ -7,7 +7,7 @@ import 'package:zooper_flutter_id3/headers/id3_header.dart';
 
 import 'id3v2_frame_content.dart';
 
-class CommentFrameContent extends FrameContent {
+class CommentFrameContent extends Id3v2FrameContent {
   late Encoding encoding;
   late String language;
   late String description;
@@ -29,24 +29,24 @@ class CommentFrameContent extends FrameContent {
 
     // Get the encoding
     encoding = getEncoding(subBytes[0]);
-    language = decodeLanguage(bytes, 1, 3);
+    language = _decodeLanguage(bytes, 1, 3);
 
     // The index where the description will end
     // TODO: "Check if subBytes.indexOf(0x00, 4)" needs the "4"
-    final splitIndex = encoding is UTF16 ? indexOfSplitPattern(subBytes, [0x00, 0x00], 4) : subBytes.indexOf(0x00, 4);
+    final splitIndex = encoding is UTF16 ? _indexOfSplitPattern(subBytes, [0x00, 0x00], 4) : subBytes.indexOf(0x00, 4);
 
-    description = decodeDescription(subBytes, 4, splitIndex);
+    description = _decodeDescription(subBytes, 4, splitIndex);
 
     final offset = splitIndex + (encoding is UTF16 ? 2 : 1);
 
     body = decodeBody(subBytes, offset);
   }
 
-  String decodeLanguage(List<int> bytes, int startIndex, int length) {
+  String _decodeLanguage(List<int> bytes, int startIndex, int length) {
     return latin1.decode(bytes.sublist(startIndex, startIndex + length));
   }
 
-  String decodeDescription(List<int> bytes, int startIndex, int endIndex) {
+  String _decodeDescription(List<int> bytes, int startIndex, int endIndex) {
     return endIndex < 0 ? '' : encoding.decode(bytes.sublist(startIndex, endIndex));
   }
 
@@ -55,7 +55,7 @@ class CommentFrameContent extends FrameContent {
     return encoding.decode(bodyBytes);
   }
 
-  int indexOfSplitPattern(List<int> list, List<int> pattern, [int initialOffset = 0]) {
+  int _indexOfSplitPattern(List<int> list, List<int> pattern, [int initialOffset = 0]) {
     for (var i = initialOffset; i < list.length - pattern.length; i += pattern.length) {
       final l = list.sublist(i, i + pattern.length);
       if (const collection.ListEquality().equals(l, pattern)) {
@@ -63,5 +63,11 @@ class CommentFrameContent extends FrameContent {
       }
     }
     return -1;
+  }
+
+  @override
+  List<int> encode() {
+    // TODO: implement encode
+    throw UnimplementedError();
   }
 }

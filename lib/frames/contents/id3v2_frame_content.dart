@@ -4,6 +4,7 @@ import 'package:zooper_flutter_id3/constants/encoding_bytes.dart';
 import 'package:zooper_flutter_id3/convertions/hex_encoding.dart';
 import 'package:zooper_flutter_id3/convertions/utf16.dart';
 import 'package:zooper_flutter_id3/enums/frame_name.dart';
+import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
 import 'package:zooper_flutter_id3/frames/contents/ignored_frame_content.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
 import 'package:zooper_flutter_id3/headers/id3_header.dart';
@@ -11,8 +12,8 @@ import 'package:zooper_flutter_id3/headers/id3_header.dart';
 import 'comment_frame_content.dart';
 import 'text_frame_content.dart';
 
-abstract class FrameContent {
-  factory FrameContent.decode(
+abstract class Id3v2FrameContent extends FrameContent {
+  factory Id3v2FrameContent.decode(
       Id3Header header, Id3v2FrameHeader frameHeader, List<int> bytes, int startIndex, int size) {
     switch (frameHeader.identifier.frameName) {
       case FrameName.picture:
@@ -78,7 +79,7 @@ abstract class FrameContent {
     }
   }
 
-  FrameContent();
+  Id3v2FrameContent();
 
   Encoding getEncoding(int type) {
     switch (type) {
@@ -109,6 +110,4 @@ abstract class FrameContent {
 
     return block;
   }
-
-  void decode(List<int> bytes, int startIndex, int size);
 }

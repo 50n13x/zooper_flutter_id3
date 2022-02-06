@@ -72,6 +72,12 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
   }
 
   @override
+  List<int> encode() {
+    // TODO: implement toByteList
+    throw UnimplementedError();
+  }
+
+  @override
   bool isFrameSupported(Id3v1Frame frame) {
     return true;
   }
@@ -80,11 +86,5 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
     var frame = Id3v1Frame<T>.decode(header, bytes, startIndex, identifier);
     addFrame(frame);
     return identifier.v11Length;
-  }
-
-  @override
-  List<int> encode() {
-    // TODO: implement toByteList
-    throw UnimplementedError();
   }
 }
