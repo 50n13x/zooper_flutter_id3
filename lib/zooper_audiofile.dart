@@ -16,6 +16,14 @@ class ZooperAudioFile {
   Id3v2Tag? get id3v2 => _id3v2tag;
   List<int> get audioData => _audioData;
 
+  List<int> encode() {
+    return <int>[
+      ...id3v2?.encode() ?? [],
+      ...audioData,
+      ...id3v1?.encode() ?? [],
+    ];
+  }
+
   Id3v1Tag? _decodeV1Tag(List<int> bytes) {
     try {
       return Id3v1Tag.decode(bytes);

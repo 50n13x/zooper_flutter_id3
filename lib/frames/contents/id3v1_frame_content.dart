@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:zooper_flutter_id3/exceptions/unsupported_type_exception.dart';
 import 'package:zooper_flutter_id3/frames/headers/frame_header.dart';
 import 'package:zooper_flutter_id3/headers/id3_header.dart';
 
@@ -8,7 +7,7 @@ import 'frame_content.dart';
 
 class Id3v1FrameContent<T> extends FrameContent {
   late T _value;
-  T get value => _value;
+  late int _frameLength;
 
   Id3v1FrameContent.decode(
     Id3Header header,
@@ -16,8 +15,11 @@ class Id3v1FrameContent<T> extends FrameContent {
     List<int> bytes,
     int startIndex,
   ) : super() {
-    decode(bytes, startIndex, frameHeader.identifier.v11Length);
+    _frameLength = frameHeader.identifier.v11Length;
+    decode(bytes, startIndex, _frameLength);
   }
+
+  T get value => _value;
 
   @override
   void decode(List<int> bytes, int startIndex, int size) {
@@ -35,15 +37,17 @@ class Id3v1FrameContent<T> extends FrameContent {
 
   @override
   List<int> encode() {
-    if (T is String) {
-      return _filledArray(value as String);
+    switch (T) {
+      case int:
+        return [value as int];
+      default:
+        return _filledArray(value as String, _frameLength);
     }
+  }
 
-    if (T is int) {
-      return [value as int];
-    }
-
-    throw UnsupportedTypeException(T);
+  @override
+  String toString() {
+    return value.toString();
   }
 
   /// Removes the NULL characters

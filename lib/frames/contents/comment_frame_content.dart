@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:collection/collection.dart' as collection;
+import 'package:zooper_flutter_id3/constants/terminations.dart';
 
 import 'package:zooper_flutter_id3/convertions/utf16.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
@@ -29,10 +30,9 @@ class CommentFrameContent extends Id3v2FrameContent {
 
     // Get the encoding
     encoding = getEncoding(subBytes[0]);
-    language = _decodeLanguage(bytes, 1, 3);
+    language = _decodeLanguage(subBytes, 1, 3);
 
     // The index where the description will end
-    // TODO: "Check if subBytes.indexOf(0x00, 4)" needs the "4"
     final splitIndex = encoding is UTF16 ? _indexOfSplitPattern(subBytes, [0x00, 0x00], 4) : subBytes.indexOf(0x00, 4);
 
     description = _decodeDescription(subBytes, 4, splitIndex);
@@ -67,7 +67,12 @@ class CommentFrameContent extends Id3v2FrameContent {
 
   @override
   List<int> encode() {
-    // TODO: implement encode
-    throw UnimplementedError();
+    return <int>[
+      getIdFromEncoding(encoding),
+      ...latin1.encode(language),
+      ...encoding.encode(description),
+      ...Terminations.getByEncoding(encoding),
+      ...encoding.encode(body),
+    ];
   }
 }

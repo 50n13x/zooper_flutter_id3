@@ -14,6 +14,8 @@ abstract class Id3Header {
 
   String get version;
 
+  int get headerSize;
+
   @protected
   set majorVersion(int value) {
     _majorVersion = value;
@@ -25,4 +27,6 @@ abstract class Id3Header {
 
     return parsedIdentifier == identifier;
   }
+
+  List<int> encode();
 }

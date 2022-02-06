@@ -6,5 +6,8 @@ class Id3v1FrameHeader extends FrameHeader {
   Id3v1FrameHeader(Id3Header id3Header, FrameIdentifier identifier) : super(id3Header, identifier);
 
   @override
-  int get contentSize => throw UnimplementedError();
+  int get contentSize => identifier.v11Length;
+
+  @override
+  int get headerSize => 0;
 }

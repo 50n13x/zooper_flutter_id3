@@ -12,6 +12,7 @@ abstract class FrameHeader {
 
   Id3Header get id3Header => _id3Header;
   FrameIdentifier get identifier => _identifier;
+  int get headerSize;
 
   int get contentSize;
 }

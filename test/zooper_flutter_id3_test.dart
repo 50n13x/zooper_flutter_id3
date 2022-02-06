@@ -11,6 +11,7 @@ void main() {
   const String file2 = 'C:/Users/Danie/Desktop/2.mp3';
   const String file3 = 'C:/Users/Danie/Desktop/3.mp3';
   const String file4 = 'C:/Users/Danie/Desktop/4.mp4';
+  const String file5 = 'C:/Users/Danie/Desktop/5.mp3';
 
   test('Loading file', () async {
     //var filePath = await _pickFile();
@@ -21,7 +22,8 @@ void main() {
 
     debugPrint(audioFile.toString());
 
-    await saveFileAsync(audioFile.audioData);
+    var encoded = audioFile.encode();
+    await saveFileAsync(encoded);
   });
 }
 

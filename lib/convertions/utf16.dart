@@ -44,7 +44,7 @@ class _UTF16LEDecoder extends Converter<List<int>, String> {
 class _UTF16LEEncoder extends Converter<String, List<int>> {
   @override
   List<int> convert(String input) {
-    return utf.encodeUtf16le(input, true) as List<int>;
+    return utf.encodeUtf16le(input, true).cast<int>();
   }
 }
 
@@ -73,6 +73,6 @@ class _UTF16BEDecoder extends Converter<List<int>, String> {
 class _UTF16BEEncoder extends Converter<String, List<int>> {
   @override
   List<int> convert(String input) {
-    return utf.encodeUtf16be(input, true) as List<int>;
+    return utf.encodeUtf16be(input, true).cast<int>();
   }
 }

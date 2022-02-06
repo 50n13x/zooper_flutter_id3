@@ -37,12 +37,16 @@ class Id3v2Frame extends Id3Frame {
     FrameContent frameContent,
   ) : super(header, frameHeader, frameContent);
 
-  /// The total framesize inclusive header
-  int get frameSize => 10 + frameHeader.contentSize;
-
   @override
   List<int> encode() {
-    // TODO: implement toByteList
-    throw UnimplementedError();
+    var frameContentBytes = frameContent.encode();
+    (frameHeader as Id3v2FrameHeader).contentSize = frameContentBytes.length;
+
+    var frameHeaderBytes = (frameHeader as Id3v2FrameHeader).encode();
+
+    return <int>[
+      ...frameHeaderBytes,
+      ...frameContentBytes,
+    ];
   }
 }

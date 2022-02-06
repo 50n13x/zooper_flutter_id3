@@ -73,8 +73,11 @@ class _DefaultTextFrameContent extends TextFrameContent {
 
   @override
   List<int> encode() {
-    // TODO: implement encode
-    throw UnimplementedError();
+    return <int>[
+      getIdFromEncoding(encoding),
+      ...encoding.encode(value),
+      ...Terminations.getByEncoding(encoding),
+    ];
   }
 }
 
@@ -89,7 +92,10 @@ class _Id3v24TextFrameContent extends TextFrameContent {
 
   @override
   List<int> encode() {
-    // TODO: implement encode
-    throw UnimplementedError();
+    return <int>[
+      getIdFromEncoding(encoding),
+      ...encoding.encode(value),
+      ...Terminations.getByEncoding(encoding),
+    ];
   }
 }

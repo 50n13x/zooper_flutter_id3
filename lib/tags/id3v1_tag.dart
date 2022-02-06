@@ -73,8 +73,15 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
 
   @override
   List<int> encode() {
-    // TODO: implement toByteList
-    throw UnimplementedError();
+    return <int>[
+      ...header.encode(),
+      ..._encodeByFrameName(FrameName.title),
+      ..._encodeByFrameName(FrameName.artist),
+      ..._encodeByFrameName(FrameName.album),
+      ..._encodeByFrameName(FrameName.year),
+      ..._encodeByFrameName(FrameName.comment),
+      ..._encodeByFrameName(FrameName.contentType),
+    ];
   }
 
   @override
@@ -86,5 +93,10 @@ class Id3v1Tag extends Id3Tag<Id3v1Frame> {
     var frame = Id3v1Frame<T>.decode(header, bytes, startIndex, identifier);
     addFrame(frame);
     return identifier.v11Length;
+  }
+
+  List<int> _encodeByFrameName(FrameName frameName) {
+    var frame = frames.firstWhere((element) => element.frameHeader.identifier.frameName == frameName);
+    return frame.encode();
   }
 }

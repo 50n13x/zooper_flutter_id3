@@ -8,8 +8,6 @@ import 'headers/frame_header.dart';
 import 'id3_frame.dart';
 
 class Id3v1Frame<T> extends Id3Frame {
-  late T value;
-
   factory Id3v1Frame.decode(Id3Header header, List<int> bytes, int startIndex, FrameIdentifier identifier) {
     // Decode the header
     var frameHeader = Id3v1FrameHeader(
@@ -33,7 +31,6 @@ class Id3v1Frame<T> extends Id3Frame {
 
   @override
   List<int> encode() {
-    // TODO: implement
-    throw UnimplementedError();
+    return frameContent.encode();
   }
 }

@@ -96,6 +96,21 @@ abstract class Id3v2FrameContent extends FrameContent {
     }
   }
 
+  int getIdFromEncoding(Encoding type) {
+    switch (type.runtimeType) {
+      case Latin1Codec:
+        return EncodingBytes.latin1;
+      case UTF16LE:
+        return EncodingBytes.utf16;
+      case UTF16BE:
+        return EncodingBytes.utf16be;
+      case Utf8Codec:
+        return EncodingBytes.utf8;
+      default:
+        throw UnimplementedError('Encoding type $type is not implemented yet');
+    }
+  }
+
   /// Returns size of frame in bytes
   List<int> frameSizeInBytes(int value) {
     assert(value <= 16777216);

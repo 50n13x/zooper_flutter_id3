@@ -55,9 +55,12 @@ abstract class Id3v2Tag extends Id3Tag {
       hasNextFrame = start < size;
     }
 
-    // Extract the padding
+    // Extract the padding and throw away
     var indexOfPaddingEnd = _getIndexOfPaddingEnd(bytes, start);
     _fullSize = indexOfPaddingEnd;
+
+    // TODO: Remove this, this is just a test
+    (header as Id3v2Header).size = start - header.headerSize;
   }
 
   Id3v2Frame? _decodeFrame(Id3Header header, List<int> bytes, int start) {
@@ -70,6 +73,28 @@ abstract class Id3v2Tag extends Id3Tag {
 
   int _getIndexOfPaddingEnd(List<int> bytes, int start) {
     return bytes.indexWhere((element) => element != 0, start);
+  }
+
+  @override
+  List<int> encode() {
+    var headerBytes = header.encode();
+    var frameBytes = _encodeFrames();
+
+    return <int>[
+      ...headerBytes,
+      ...frameBytes,
+      //..._padding,
+    ];
+  }
+
+  List<int> _encodeFrames() {
+    var list = <int>[];
+
+    for (var frame in frames) {
+      list.addAll(frame.encode());
+    }
+
+    return list;
   }
 }
 
@@ -85,12 +110,6 @@ class Id3v24Tag extends Id3v2Tag {
   bool isFrameSupported(Id3Frame frame) {
     return frame.frameHeader.identifier.v24Name != null;
   }
-
-  @override
-  List<int> encode() {
-    // TODO: implement toByteList
-    throw UnimplementedError();
-  }
 }
 
 class Id3v23Tag extends Id3v2Tag {
@@ -105,12 +124,6 @@ class Id3v23Tag extends Id3v2Tag {
   bool isFrameSupported(Id3Frame frame) {
     return frame.frameHeader.identifier.v23Name != null;
   }
-
-  @override
-  List<int> encode() {
-    // TODO: implement toByteList
-    throw UnimplementedError();
-  }
 }
 
 class Id3v22Tag extends Id3v2Tag {
@@ -124,11 +137,5 @@ class Id3v22Tag extends Id3v2Tag {
   @override
   bool isFrameSupported(Id3Frame frame) {
     return frame.frameHeader.identifier.v22Name != null;
-  }
-
-  @override
-  List<int> encode() {
-    // TODO: implement toByteList
-    throw UnimplementedError();
   }
 }

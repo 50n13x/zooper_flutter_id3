@@ -8,15 +8,18 @@ abstract class Id3Frame {
   final FrameHeader _frameHeader;
   final FrameContent _frameContent;
 
+  Id3Header get header => _header;
+  FrameHeader get frameHeader => _frameHeader;
+  FrameContent get frameContent => _frameContent;
+
+  /// The total framesize inclusive header
+  int get frameSize => frameHeader.headerSize + frameHeader.contentSize;
+
   Id3Frame(
     this._header,
     this._frameHeader,
     this._frameContent,
   );
-
-  Id3Header get header => _header;
-  FrameHeader get frameHeader => _frameHeader;
-  FrameContent get frameContent => _frameContent;
 
   /// Converts the Frame to a [List] of [int]
   List<int> encode();

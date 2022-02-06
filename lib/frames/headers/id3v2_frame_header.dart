@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:collection/collection.dart';
-import 'package:zooper_flutter_id3/exceptions/id3_exception.dart';
 import 'package:zooper_flutter_id3/exceptions/unsupported_frame_exception.dart';
 import 'package:zooper_flutter_id3/exceptions/unsupported_version_exception.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifier.dart';
@@ -12,6 +11,16 @@ import 'package:zooper_flutter_id3/helpers/size_calculator.dart';
 
 abstract class Id3v2FrameHeader extends FrameHeader {
   late int _contentSize;
+
+  int get identifierFieldSize;
+  int get sizeFieldSize;
+
+  @override
+  int get contentSize => _contentSize;
+
+  set contentSize(int size) {
+    _contentSize = contentSize;
+  }
 
   factory Id3v2FrameHeader.decode(Id3v2Header header, List<int> bytes, int startIndex) {
     var identifier = decodeFrameIdentifier(header, bytes, startIndex);
@@ -28,19 +37,25 @@ abstract class Id3v2FrameHeader extends FrameHeader {
     throw UnsupportedVersionException(header.version);
   }
 
-  Id3v2FrameHeader(Id3Header header, List<int> bytes, int startIndex, FrameIdentifier identifier)
+  Id3v2FrameHeader._decode(Id3Header header, List<int> bytes, int startIndex, FrameIdentifier identifier)
       : super(header, identifier) {
-    load(bytes, startIndex);
+    decode(bytes, startIndex);
   }
 
-  int get headerSize;
-  int get identifierFieldSize;
-  int get sizeFieldSize;
+  /// Decodes the Header
+  void decode(List<int> bytes, int startIndex);
+
+  /// Encodes the header
+  List<int> encode();
+
+  int decodeFrameSize(List<int> bytes, int startIndex);
+
+  List<int> encodeFrameSize(int frameSize);
 
   @override
-  int get contentSize => _contentSize;
-
-  void load(List<int> bytes, int startIndex);
+  String toString() {
+    return '${identifier.frameName.name} | ${identifier.v24Name ?? identifier.v23Name ?? identifier.v22Name}';
+  }
 
   static FrameIdentifier decodeFrameIdentifier(Id3Header id3Header, List<int> bytes, int startIndex) {
     FrameIdentifier? frameIdentifier;
@@ -69,26 +84,6 @@ abstract class Id3v2FrameHeader extends FrameHeader {
 
     return frameIdentifier;
   }
-
-  int loadFrameSize(List<int> bytes, int startIndex) {
-    final size = id3Header.majorVersion == 4
-        ? SizeCalculator.sizeOfSyncSafe(bytes.sublist(startIndex, startIndex + 4))
-        : id3Header.majorVersion == 3
-            ? SizeCalculator.sizeOf(bytes.sublist(startIndex, startIndex + 4))
-            : id3Header.majorVersion == 2
-                ? SizeCalculator.sizeOfSyncSafe([0, bytes[startIndex], bytes[startIndex + 1], bytes[startIndex + 2]])
-                : throw UnsupportedVersionException(id3Header.majorVersion.toString());
-    if (size <= 0) {
-      throw Id3Exception('The calculated size is invalid');
-    }
-
-    return size;
-  }
-
-  @override
-  String toString() {
-    return '${identifier.frameName.name} | ${identifier.v24Name ?? identifier.v23Name ?? identifier.v22Name}';
-  }
 }
 
 class Id3v24FrameHeader extends Id3v23FrameHeader {
@@ -98,6 +93,25 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
     int startIndex,
     FrameIdentifier identifier,
   ) : super(id3v2Header, bytes, startIndex, identifier);
+
+  @override
+  int decodeFrameSize(List<int> bytes, int startIndex) {
+    return SizeCalculator.sizeOfSyncSafe(bytes.sublist(startIndex, startIndex + 4));
+  }
+
+  @override
+  List<int> encode() {
+    return <int>[
+      ...utf8.encode(identifier.v24Name!),
+      ...encodeFrameSize(contentSize),
+      ...flags,
+    ];
+  }
+
+  @override
+  List<int> encodeFrameSize(int frameSize) {
+    return SizeCalculator.frameSizeInSynchSafeBytes(frameSize);
+  }
 }
 
 class Id3v23FrameHeader extends Id3v2FrameHeader {
@@ -106,7 +120,7 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
     List<int> bytes,
     int startIndex,
     FrameIdentifier identifier,
-  ) : super(id3v2Header, bytes, startIndex, identifier);
+  ) : super._decode(id3v2Header, bytes, startIndex, identifier);
 
   @override
   int get headerSize => 10;
@@ -123,9 +137,28 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
   List<int> get flags => _flags;
 
   @override
-  void load(List<int> bytes, int startIndex) {
-    _contentSize = loadFrameSize(bytes, startIndex + identifierFieldSize);
+  void decode(List<int> bytes, int startIndex) {
+    _contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
     _flags = _loadFlags(bytes, startIndex + identifierFieldSize + sizeFieldSize);
+  }
+
+  @override
+  int decodeFrameSize(List<int> bytes, int startIndex) {
+    return SizeCalculator.sizeOf(bytes.sublist(startIndex, startIndex + 4));
+  }
+
+  @override
+  List<int> encode() {
+    return <int>[
+      ...utf8.encode(identifier.v23Name!),
+      ...encodeFrameSize(contentSize),
+      ...flags,
+    ];
+  }
+
+  @override
+  List<int> encodeFrameSize(int frameSize) {
+    return SizeCalculator.frameSizeInBytes(frameSize);
   }
 
   List<int> _loadFlags(List<int> bytes, int startIndex) {
@@ -139,7 +172,7 @@ class Id3v22FrameHeader extends Id3v2FrameHeader {
     List<int> bytes,
     int startIndex,
     FrameIdentifier identifier,
-  ) : super(id3v2Header, bytes, startIndex, identifier);
+  ) : super._decode(id3v2Header, bytes, startIndex, identifier);
 
   @override
   int get headerSize => 6;
@@ -151,7 +184,28 @@ class Id3v22FrameHeader extends Id3v2FrameHeader {
   int get sizeFieldSize => 3;
 
   @override
-  void load(List<int> bytes, int startIndex) {
-    _contentSize = loadFrameSize(bytes, startIndex + identifierFieldSize);
+  void decode(List<int> bytes, int startIndex) {
+    _contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
+  }
+
+  @override
+  int decodeFrameSize(List<int> bytes, int startIndex) {
+    return SizeCalculator.sizeOfSyncSafe([
+      0,
+      ...bytes.sublist(startIndex, startIndex + 2),
+    ]);
+  }
+
+  @override
+  List<int> encode() {
+    return <int>[
+      ...utf8.encode(identifier.v22Name!),
+      ...encodeFrameSize(contentSize),
+    ];
+  }
+
+  @override
+  List<int> encodeFrameSize(int frameSize) {
+    return SizeCalculator.frameSizeIn3Bytes(frameSize);
   }
 }
