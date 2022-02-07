@@ -4,8 +4,9 @@ import 'dart:typed_data';
 
 import 'package:zooper_flutter_id3/exceptions/tag_not_found_exception.dart';
 import 'package:zooper_flutter_id3/exceptions/unsupported_version_exception.dart';
-import 'package:zooper_flutter_id3/headers/id3_header.dart';
 import 'package:zooper_flutter_id3/helpers/size_calculator.dart';
+
+import 'id3_header.dart';
 
 class Id3v2Header extends Id3Header {
   late int _revisionVersion;

@@ -15,11 +15,12 @@ void main() {
   const String file4 = 'C:/Users/Danie/Desktop/4.mp4';
   const String file5 = 'C:/Users/Danie/Desktop/5.mp3';
   const String file6 = 'C:/Users/Danie/Desktop/6.mp3';
+  const String file7 = 'C:/Users/Danie/Desktop/star_test.mp3';
 
   test('Loading file', () async {
     //var filePath = await _pickFile();
 
-    final bytes = await _loadBytesAsync(file6);
+    final bytes = await _loadBytesAsync(file7);
 
     final ZooperAudioFile audioFile = ZooperAudioFile.decode(bytes);
 

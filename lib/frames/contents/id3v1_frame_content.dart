@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:zooper_flutter_id3/frames/headers/frame_header.dart';
-import 'package:zooper_flutter_id3/headers/id3_header.dart';
+import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 
 import 'frame_content.dart';
 

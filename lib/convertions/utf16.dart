@@ -44,6 +44,7 @@ class _UTF16LEDecoder extends Converter<List<int>, String> {
 class _UTF16LEEncoder extends Converter<String, List<int>> {
   @override
   List<int> convert(String input) {
+    var bytes = utf.encodeUtf16le(input, true);
     return utf.encodeUtf16le(input, true).cast<int>();
   }
 }

@@ -5,40 +5,31 @@ import 'package:zooper_flutter_id3/exceptions/unsupported_version_exception.dart
 import 'package:zooper_flutter_id3/frames/frame_identifier.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifiers.dart';
 import 'package:zooper_flutter_id3/frames/headers/frame_header.dart';
-import 'package:zooper_flutter_id3/headers/id3_header.dart';
-import 'package:zooper_flutter_id3/headers/id3v2_header.dart';
 import 'package:zooper_flutter_id3/helpers/size_calculator.dart';
+import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
+import 'package:zooper_flutter_id3/tags/headers/id3v2_header.dart';
 
 abstract class Id3v2FrameHeader extends FrameHeader {
-  late int _contentSize;
-
   int get identifierFieldSize;
   int get sizeFieldSize;
 
-  @override
-  int get contentSize => _contentSize;
-
-  set contentSize(int size) {
-    _contentSize = contentSize;
-  }
-
   factory Id3v2FrameHeader.decode(Id3v2Header header, List<int> bytes, int startIndex) {
-    var identifier = decodeFrameIdentifier(header, bytes, startIndex);
+    //var identifier = decodeFrameIdentifier(header, bytes, startIndex);
 
     switch (header.majorVersion) {
       case 4:
-        return Id3v24FrameHeader(header, bytes, startIndex, identifier);
+        return Id3v24FrameHeader.decode(header, bytes, startIndex);
       case 3:
-        return Id3v23FrameHeader(header, bytes, startIndex, identifier);
+        return Id3v23FrameHeader.decode(header, bytes, startIndex);
       case 2:
-        return Id3v22FrameHeader(header, bytes, startIndex, identifier);
+        return Id3v22FrameHeader.decode(header, bytes, startIndex);
     }
 
     throw UnsupportedVersionException(header.version);
   }
 
   Id3v2FrameHeader._decode(Id3Header header, List<int> bytes, int startIndex, FrameIdentifier identifier)
-      : super(header, identifier) {
+      : super(identifier) {
     decode(bytes, startIndex);
   }
 
@@ -57,7 +48,7 @@ abstract class Id3v2FrameHeader extends FrameHeader {
     return '${identifier.frameName.name} | ${identifier.v24Name ?? identifier.v23Name ?? identifier.v22Name}';
   }
 
-  static FrameIdentifier decodeFrameIdentifier(Id3Header id3Header, List<int> bytes, int startIndex) {
+  /*static FrameIdentifier decodeFrameIdentifier(Id3Header id3Header, List<int> bytes, int startIndex) {
     FrameIdentifier? frameIdentifier;
     String identifierId;
 
@@ -83,10 +74,25 @@ abstract class Id3v2FrameHeader extends FrameHeader {
     }
 
     return frameIdentifier;
-  }
+  } */
 }
 
 class Id3v24FrameHeader extends Id3v23FrameHeader {
+  factory Id3v24FrameHeader.decode(
+    Id3v2Header id3v2Header,
+    List<int> bytes,
+    int startIndex,
+  ) {
+    String identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 4));
+    FrameIdentifier? frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v24Name == identifierId);
+
+    if (frameIdentifier == null) {
+      throw UnsupportedFrameException(identifierId);
+    }
+
+    return Id3v24FrameHeader(id3v2Header, bytes, startIndex, frameIdentifier);
+  }
+
   Id3v24FrameHeader(
     Id3v2Header id3v2Header,
     List<int> bytes,
@@ -101,11 +107,12 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
 
   @override
   List<int> encode() {
-    return <int>[
+    var encoded = <int>[
       ...utf8.encode(identifier.v24Name!),
       ...encodeFrameSize(contentSize),
       ...flags,
     ];
+    return encoded;
   }
 
   @override
@@ -115,6 +122,21 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
 }
 
 class Id3v23FrameHeader extends Id3v2FrameHeader {
+  factory Id3v23FrameHeader.decode(
+    Id3v2Header id3v2Header,
+    List<int> bytes,
+    int startIndex,
+  ) {
+    String identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 4));
+    FrameIdentifier? frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v23Name == identifierId);
+
+    if (frameIdentifier == null) {
+      throw UnsupportedFrameException(identifierId);
+    }
+
+    return Id3v23FrameHeader(id3v2Header, bytes, startIndex, frameIdentifier);
+  }
+
   Id3v23FrameHeader(
     Id3v2Header id3v2Header,
     List<int> bytes,
@@ -138,7 +160,7 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
 
   @override
   void decode(List<int> bytes, int startIndex) {
-    _contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
+    contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
     _flags = _loadFlags(bytes, startIndex + identifierFieldSize + sizeFieldSize);
   }
 
@@ -167,6 +189,21 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
 }
 
 class Id3v22FrameHeader extends Id3v2FrameHeader {
+  factory Id3v22FrameHeader.decode(
+    Id3v2Header id3v2Header,
+    List<int> bytes,
+    int startIndex,
+  ) {
+    String identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 3));
+    FrameIdentifier? frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v22Name == identifierId);
+
+    if (frameIdentifier == null) {
+      throw UnsupportedFrameException(identifierId);
+    }
+
+    return Id3v22FrameHeader(id3v2Header, bytes, startIndex, frameIdentifier);
+  }
+
   Id3v22FrameHeader(
     Id3v2Header id3v2Header,
     List<int> bytes,
@@ -185,17 +222,12 @@ class Id3v22FrameHeader extends Id3v2FrameHeader {
 
   @override
   void decode(List<int> bytes, int startIndex) {
-    _contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
+    contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
   }
 
   @override
   int decodeFrameSize(List<int> bytes, int startIndex) {
     return SizeCalculator.sizeOf3(bytes.sublist(startIndex, startIndex + 3));
-
-    return SizeCalculator.sizeOfSyncSafe([
-      0,
-      ...bytes.sublist(startIndex, startIndex + 2),
-    ]);
   }
 
   @override

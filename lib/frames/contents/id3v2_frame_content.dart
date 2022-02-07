@@ -7,7 +7,7 @@ import 'package:zooper_flutter_id3/enums/frame_name.dart';
 import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
 import 'package:zooper_flutter_id3/frames/contents/ignored_frame_content.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
-import 'package:zooper_flutter_id3/headers/id3_header.dart';
+import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 
 import 'comment_frame_content.dart';
 import 'text_frame_content.dart';

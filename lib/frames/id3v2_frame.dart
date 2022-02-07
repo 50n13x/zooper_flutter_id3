@@ -1,12 +1,10 @@
-import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
 import 'package:zooper_flutter_id3/frames/contents/id3v2_frame_content.dart';
-import 'package:zooper_flutter_id3/frames/headers/frame_header.dart';
 import 'package:zooper_flutter_id3/frames/id3_frame.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
-import 'package:zooper_flutter_id3/headers/id3_header.dart';
-import 'package:zooper_flutter_id3/headers/id3v2_header.dart';
+import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
+import 'package:zooper_flutter_id3/tags/headers/id3v2_header.dart';
 
-class Id3v2Frame extends Id3Frame {
+class Id3v2Frame extends Id3Frame<Id3v2FrameHeader, Id3v2FrameContent> {
   factory Id3v2Frame.decode(
     Id3Header header,
     List<int> bytes,
@@ -33,20 +31,22 @@ class Id3v2Frame extends Id3Frame {
 
   Id3v2Frame(
     Id3Header header,
-    FrameHeader frameHeader,
-    FrameContent frameContent,
-  ) : super(header, frameHeader, frameContent);
+    Id3v2FrameHeader frameHeader,
+    Id3v2FrameContent frameContent,
+  ) : super(frameHeader, frameContent);
 
   @override
   List<int> encode() {
     var frameContentBytes = frameContent.encode();
-    (frameHeader as Id3v2FrameHeader).contentSize = frameContentBytes.length;
+    frameHeader.contentSize = frameContentBytes.length;
 
-    var frameHeaderBytes = (frameHeader as Id3v2FrameHeader).encode();
+    var frameHeaderBytes = frameHeader.encode();
 
-    return <int>[
+    var frameBytes = <int>[
       ...frameHeaderBytes,
       ...frameContentBytes,
     ];
+
+    return frameBytes;
   }
 }
