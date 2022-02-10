@@ -23,7 +23,7 @@ class Id3v1Frame<T> extends Id3Frame {
     return Id3v1Frame(frameHeader, frameContent);
   }
 
-  Id3v1Frame(FrameHeader frameHeader, FrameContent frameContent) : super(frameHeader, frameContent);
+  const Id3v1Frame(FrameHeader frameHeader, FrameContent frameContent) : super(frameHeader, frameContent);
 
   @override
   List<int> encode() {

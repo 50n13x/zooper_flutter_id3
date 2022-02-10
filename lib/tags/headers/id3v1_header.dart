@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:zooper_flutter_id3/exceptions/tag_not_found_exception.dart';
 
 import 'id3_header.dart';
 
-class Id3v1Header extends Id3Header {
+class Id3v1Header extends Id3Header with EquatableMixin {
   @override
   String get identifier => 'TAG';
 
@@ -31,4 +32,7 @@ class Id3v1Header extends Id3Header {
       ...latin1.encode(identifier),
     ];
   }
+
+  @override
+  List<Object?> get props => [majorVersion];
 }

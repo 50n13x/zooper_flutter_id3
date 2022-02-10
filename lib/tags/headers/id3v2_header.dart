@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'dart:typed_data';
 
+import 'package:equatable/equatable.dart';
 import 'package:zooper_flutter_id3/exceptions/tag_not_found_exception.dart';
 import 'package:zooper_flutter_id3/exceptions/unsupported_version_exception.dart';
 import 'package:zooper_flutter_id3/helpers/size_calculator.dart';
 
 import 'id3_header.dart';
 
-class Id3v2Header extends Id3Header {
+class Id3v2Header extends Id3Header with EquatableMixin {
   late int _revisionVersion;
   late int _flags;
 
@@ -120,4 +121,7 @@ class Id3v2Header extends Id3Header {
   List<int> _encodeSize(int size) {
     return SizeCalculator.frameSizeInSynchSafeBytes(size);
   }
+
+  @override
+  List<Object?> get props => [majorVersion, revisionVersion, flags];
 }

@@ -59,8 +59,6 @@ class Id3v1Content extends Id3Content<Id3v1Frame> {
   @override
   List<int> encode() {
     return <int>[
-      // Implement header.encode() into tag class
-      //...header.encode(),
       ..._encodeByFrameName(FrameName.title),
       ..._encodeByFrameName(FrameName.artist),
       ..._encodeByFrameName(FrameName.album),
@@ -72,7 +70,12 @@ class Id3v1Content extends Id3Content<Id3v1Frame> {
 
   @override
   bool isFrameSupported(Id3v1Frame frame) {
-    return true;
+    return frame.frameHeader.identifier.frameName == FrameName.title ||
+        frame.frameHeader.identifier.frameName == FrameName.artist ||
+        frame.frameHeader.identifier.frameName == FrameName.album ||
+        frame.frameHeader.identifier.frameName == FrameName.year ||
+        frame.frameHeader.identifier.frameName == FrameName.comment ||
+        frame.frameHeader.identifier.frameName == FrameName.contentType;
   }
 
   int _loadFrame<T>(Id3Header header, FrameIdentifier identifier, List<int> bytes, int startIndex) {

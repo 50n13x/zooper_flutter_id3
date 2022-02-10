@@ -29,7 +29,7 @@ class Id3v2Frame extends Id3Frame<Id3v2FrameHeader, Id3v2FrameContent> {
     return Id3v2Frame(header, frameHeader, frameContent);
   }
 
-  Id3v2Frame(
+  const Id3v2Frame(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
     Id3v2FrameContent frameContent,

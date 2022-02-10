@@ -5,7 +5,7 @@ import 'package:zooper_flutter_id3/tags/contents/id3_content.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3v2_header.dart';
 
-abstract class Id3v2Content extends Id3Content {
+abstract class Id3v2Content extends Id3Content<Id3v2Frame> {
   factory Id3v2Content.decode(
     Id3v2Header header,
     List<int> bytes,
@@ -41,9 +41,12 @@ abstract class Id3v2Content extends Id3Content {
       hasNextFrame = start < size;
     }
 
-    // Extract the padding and throw away
-    //var indexOfPaddingEnd = _getIndexOfPaddingEnd(bytes, start);
-    //_paddingSize = indexOfPaddingEnd - start;
+    // In order to read the audio data, we need to set the header size
+    // equally to the index of the first non-padding frame
+    //
+    // Looks shit, but works
+    var indexOfPaddingEnd = _getIndexOfPaddingEnd(bytes, start);
+    header.frameSize = indexOfPaddingEnd - header.headerSize;
   }
 
   @override

@@ -1,10 +1,11 @@
+import 'package:zooper_flutter_id3/audio/audio_data.dart';
 import 'package:zooper_flutter_id3/tags/id3v1_tag.dart';
 import 'package:zooper_flutter_id3/tags/id3v2_tag.dart';
 
 class ZooperAudioFile {
   Id3v1Tag? _id3v1tag;
   Id3v2Tag? _id3v2tag;
-  late List<int> _audioData;
+  late AudioData _audioData;
 
   ZooperAudioFile.decode(List<int> bytes) {
     _id3v1tag = _decodeV1Tag(bytes);
@@ -14,12 +15,12 @@ class ZooperAudioFile {
 
   Id3v1Tag? get id3v1 => _id3v1tag;
   Id3v2Tag? get id3v2 => _id3v2tag;
-  List<int> get audioData => _audioData;
+  AudioData get audioData => _audioData;
 
   List<int> encode() {
     return <int>[
       ...id3v2?.encode() ?? [],
-      ...audioData,
+      ...audioData.audioData,
       ...id3v1?.encode() ?? [],
     ];
   }
@@ -40,10 +41,10 @@ class ZooperAudioFile {
     }
   }
 
-  List<int> _getAudioData(List<int> bytes, Id3v1Tag? v1, Id3v2Tag? v2) {
+  AudioData _getAudioData(List<int> bytes, Id3v1Tag? v1, Id3v2Tag? v2) {
     var start = v2?.fullSize ?? 0;
     var end = v1 == null ? bytes.length : bytes.length - Id3v1Tag.tagLength;
 
-    return bytes.sublist(start, end);
+    return AudioData.sublist(bytes, start, end);
   }
 }

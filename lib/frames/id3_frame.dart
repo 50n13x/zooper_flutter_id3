@@ -1,8 +1,9 @@
+import 'package:equatable/equatable.dart';
 import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
 
 import 'headers/frame_header.dart';
 
-abstract class Id3Frame<THeader extends FrameHeader, TContent extends FrameContent> {
+abstract class Id3Frame<THeader extends FrameHeader, TContent extends FrameContent> extends Equatable {
   final THeader _frameHeader;
   final TContent _frameContent;
 
@@ -12,7 +13,7 @@ abstract class Id3Frame<THeader extends FrameHeader, TContent extends FrameConte
   /// The total framesize inclusive header
   int get frameSize => frameHeader.headerSize + frameHeader.contentSize;
 
-  Id3Frame(
+  const Id3Frame(
     this._frameHeader,
     this._frameContent,
   );
@@ -24,4 +25,7 @@ abstract class Id3Frame<THeader extends FrameHeader, TContent extends FrameConte
   String toString() {
     return _frameHeader.identifier.frameName.name;
   }
+
+  @override
+  List<Object?> get props => [frameHeader, frameContent];
 }

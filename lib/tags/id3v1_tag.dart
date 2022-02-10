@@ -6,7 +6,10 @@ import 'package:zooper_flutter_id3/tags/id3_tag.dart';
 
 import 'headers/id3v1_header.dart';
 
-class Id3v1Tag extends Id3Tag<Id3v1Frame> {
+class Id3v1Tag extends Id3Tag<Id3v1Header, Id3v1Content, Id3v1Frame> {
+  /// The length of the complete ID3v1 Tag
+  ///
+  /// This is always 128, everything else is an invalid size
   static const int tagLength = 128;
 
   factory Id3v1Tag.decode(List<int> bytes) {
