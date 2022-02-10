@@ -6,21 +6,39 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zooper_flutter_encoding_utf16/zooper_flutter_encoding_utf16.dart';
 import 'package:zooper_flutter_id3/zooper_audiofile.dart';
 
+const String file1 = 'C:/Users/Danie/Desktop/1.mp3';
+const String file2 = 'C:/Users/Danie/Desktop/2.mp3';
+const String file3 = 'C:/Users/Danie/Desktop/3.mp3';
+const String file4 = 'C:/Users/Danie/Desktop/4.mp4';
+const String file5 = 'C:/Users/Danie/Desktop/5.mp3';
+const String file6 = 'C:/Users/Danie/Desktop/6.mp3';
+const String file7 = 'C:/Users/Danie/Desktop/star_test.mp3';
+
 void main() {
-  const String file1 = 'C:/Users/Danie/Desktop/1.mp3';
-  const String file2 = 'C:/Users/Danie/Desktop/2.mp3';
-  const String file3 = 'C:/Users/Danie/Desktop/3.mp3';
-  const String file4 = 'C:/Users/Danie/Desktop/4.mp4';
-  const String file5 = 'C:/Users/Danie/Desktop/5.mp3';
-  const String file6 = 'C:/Users/Danie/Desktop/6.mp3';
-  const String file7 = 'C:/Users/Danie/Desktop/star_test.mp3';
+  var emojiString = '🔥';
+  var emojiBytes = <int>[0xFF, 0xFE, 0x3D, 0xD8, 0x25, 0xDD];
+
+  test('Decode Emoji', () {
+    var encoder = UTF16LE();
+    var emoji = encoder.decode(emojiBytes);
+
+    expect(emoji, emojiString);
+  });
+
+  test('Encode Emoji', () {
+    var encoder = UTF16LE();
+    var emoji = encoder.encodeWithBOM(emojiString);
+
+    expect(emoji, emojiBytes);
+  });
 
   test('Loading file', () async {
     //var filePath = await _pickFile();
 
-    final bytes = await _loadBytesAsync(file7);
+    final bytes = await _loadBytesAsync(file6);
 
     final ZooperAudioFile audioFile = ZooperAudioFile.decode(bytes);
 

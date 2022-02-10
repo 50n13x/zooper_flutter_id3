@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:zooper_flutter_encoding_utf16/zooper_flutter_encoding_utf16.dart';
 import 'package:zooper_flutter_id3/constants/encoding_bytes.dart';
 import 'package:zooper_flutter_id3/convertions/hex_encoding.dart';
-import 'package:zooper_flutter_id3/convertions/utf16.dart';
 import 'package:zooper_flutter_id3/enums/frame_name.dart';
 import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
 import 'package:zooper_flutter_id3/frames/contents/ignored_frame_content.dart';

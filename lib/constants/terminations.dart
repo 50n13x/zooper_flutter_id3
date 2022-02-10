@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:zooper_flutter_id3/convertions/utf16.dart';
+import 'package:zooper_flutter_encoding_utf16/zooper_flutter_encoding_utf16.dart';
 import 'package:zooper_flutter_id3/exceptions/id3_exception.dart';
 
 class Terminations {

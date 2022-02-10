@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:collection/collection.dart' as collection;
+import 'package:zooper_flutter_encoding_utf16/zooper_flutter_encoding_utf16.dart';
 import 'package:zooper_flutter_id3/constants/terminations.dart';
 
-import 'package:zooper_flutter_id3/convertions/utf16.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 
