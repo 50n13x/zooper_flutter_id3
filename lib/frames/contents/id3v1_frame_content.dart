@@ -9,6 +9,8 @@ class Id3v1FrameContent<T> extends FrameContent {
   late T _value;
   late int _frameLength;
 
+  T get value => _value;
+
   Id3v1FrameContent.decode(
     Id3Header header,
     FrameHeader frameHeader,
@@ -16,14 +18,8 @@ class Id3v1FrameContent<T> extends FrameContent {
     int startIndex,
   ) : super() {
     _frameLength = frameHeader.identifier.v11Length;
-    decode(bytes, startIndex, _frameLength);
-  }
 
-  T get value => _value;
-
-  @override
-  void decode(List<int> bytes, int startIndex, int size) {
-    var subBytes = _clearZeros(bytes.sublist(startIndex, startIndex + size));
+    var subBytes = _clearZeros(bytes.sublist(startIndex, startIndex + _frameLength));
 
     switch (T) {
       case int:

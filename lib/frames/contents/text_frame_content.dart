@@ -1,48 +1,23 @@
-import 'dart:convert';
-
+import 'package:zooper_flutter_encoding_utf16/zooper_flutter_encoding_utf16.dart';
 import 'package:zooper_flutter_id3/constants/terminations.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
+import 'package:zooper_flutter_id3/frames/models/text_model.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 
 import 'id3v2_frame_content.dart';
 
-abstract class TextFrameContent extends Id3v2FrameContent {
-  factory TextFrameContent.decode(
+class TextFrameContent extends Id3v2FrameContent<TextModel> {
+  TextFrameContent.decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
     List<int> bytes,
     int startIndex,
     int size,
   ) {
-    if (header.majorVersion == 4) {
-      return _Id3v24TextFrameContent.decode(header, frameHeader, bytes, startIndex, size);
-    }
-
-    return _DefaultTextFrameContent.decode(header, frameHeader, bytes, startIndex, size);
-  }
-
-  TextFrameContent._decode(
-    Id3Header header,
-    Id3v2FrameHeader frameHeader,
-    List<int> bytes,
-    int startIndex,
-    int size,
-  ) : super() {
-    decode(bytes, startIndex, size);
-  }
-
-  late String _value;
-  String get value => _value;
-
-  late Encoding _encoding;
-  Encoding get encoding => _encoding;
-
-  @override
-  void decode(List<int> bytes, int startIndex, int size) {
     var sublist = bytes.sublist(startIndex, startIndex + size);
 
     // Get the encoding
-    _encoding = getEncoding(sublist[0]);
+    var encoding = getEncoding(sublist[0]);
 
     var termination = Terminations.getByEncoding(encoding);
     bool hasTermination = Terminations.hasTermination(
@@ -53,51 +28,28 @@ abstract class TextFrameContent extends Id3v2FrameContent {
     var end = hasTermination ? sublist.length - termination.length : sublist.length;
 
     // Decode the string
-    _value = encoding.decode(sublist.sublist(1, end));
+    var value = encoding.decode(sublist.sublist(1, end));
+
+    model = TextModel(encoding, value);
   }
 
   @override
   String toString() {
-    return _value;
+    return model.value;
   }
-}
-
-class _DefaultTextFrameContent extends TextFrameContent {
-  _DefaultTextFrameContent.decode(
-    Id3Header header,
-    Id3v2FrameHeader frameHeader,
-    List<int> bytes,
-    int startIndex,
-    int size,
-  ) : super._decode(header, frameHeader, bytes, startIndex, size);
 
   @override
   List<int> encode() {
+    var encoded = model.encoding is UTF16
+        ? (model.encoding as UTF16).encodeWithBOM(model.value)
+        : model.encoding.encode(model.value);
+
     var bytes = <int>[
-      getIdFromEncoding(encoding),
-      ...encoding.encode(value),
-      ...Terminations.getByEncoding(encoding),
+      getIdFromEncoding(model.encoding),
+      ...encoded,
+      ...Terminations.getByEncoding(model.encoding),
     ];
 
     return bytes;
-  }
-}
-
-class _Id3v24TextFrameContent extends TextFrameContent {
-  _Id3v24TextFrameContent.decode(
-    Id3Header header,
-    Id3v2FrameHeader frameHeader,
-    List<int> bytes,
-    int startIndex,
-    int size,
-  ) : super._decode(header, frameHeader, bytes, startIndex, size);
-
-  @override
-  List<int> encode() {
-    return <int>[
-      getIdFromEncoding(encoding),
-      ...encoding.encode(value),
-      ...Terminations.getByEncoding(encoding),
-    ];
   }
 }

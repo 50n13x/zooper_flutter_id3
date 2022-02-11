@@ -6,11 +6,17 @@ import 'headers/id3v2_header.dart';
 
 class Id3v2Tag extends Id3Tag<Id3v2Header, Id3v2Content, Id3v2Frame> {
   /// Decodes the Id3v2Tag
-  factory Id3v2Tag.decode(
+  static Id3v2Tag? decode(
     List<int> bytes,
     int startIndex,
   ) {
-    var header = Id3v2Header(bytes, startIndex);
+    var header = Id3v2Header.decode(bytes, startIndex);
+
+    // If the header is not ID3v2 Header, just return
+    if (header == null) {
+      return null;
+    }
+
     var content = Id3v2Content.decode(header, bytes, startIndex + header.headerSize);
 
     return Id3v2Tag(header, content);

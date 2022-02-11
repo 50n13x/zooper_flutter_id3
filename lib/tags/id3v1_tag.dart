@@ -12,14 +12,22 @@ class Id3v1Tag extends Id3Tag<Id3v1Header, Id3v1Content, Id3v1Frame> {
   /// This is always 128, everything else is an invalid size
   static const int tagLength = 128;
 
-  factory Id3v1Tag.decode(List<int> bytes) {
-    var header = Id3v1Header(bytes, bytes.length - tagLength);
+  Id3v1Tag(Id3v1Header header, Id3v1Content content) : super(header, content);
+
+  /// Decodes the Tag
+  ///
+  /// Returns null if the tag could not be extracted
+  static Id3v1Tag? decode(List<int> bytes) {
+    var header = Id3v1Header.decode(bytes, bytes.length - tagLength);
+
+    if (header == null) {
+      return null;
+    }
+
     var content = Id3v1Content.decode(header, bytes, bytes.length - tagLength + header.headerSize);
 
     return Id3v1Tag(header, content);
   }
-
-  Id3v1Tag(Id3v1Header header, Id3v1Content content) : super(header, content);
 
   @override
   List<int> encode() {

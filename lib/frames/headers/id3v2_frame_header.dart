@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:collection/collection.dart';
-import 'package:zooper_flutter_id3/exceptions/unsupported_frame_exception.dart';
-import 'package:zooper_flutter_id3/exceptions/unsupported_version_exception.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifier.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifiers.dart';
 import 'package:zooper_flutter_id3/frames/headers/frame_header.dart';
@@ -13,9 +11,15 @@ abstract class Id3v2FrameHeader extends FrameHeader {
   int get identifierFieldSize;
   int get sizeFieldSize;
 
-  factory Id3v2FrameHeader.decode(Id3v2Header header, List<int> bytes, int startIndex) {
-    //var identifier = decodeFrameIdentifier(header, bytes, startIndex);
+  Id3v2FrameHeader._internalDecode(Id3Header header, List<int> bytes, int startIndex, FrameIdentifier identifier)
+      : super(identifier) {
+    _internalDecode(bytes, startIndex);
+  }
 
+  /// Decodes the FrameHeader
+  ///
+  /// Returns null if the FrameHeader could not be decoded
+  static Id3v2FrameHeader? decode(Id3v2Header header, List<int> bytes, int startIndex) {
     switch (header.majorVersion) {
       case 4:
         return Id3v24FrameHeader.decode(header, bytes, startIndex);
@@ -25,16 +29,8 @@ abstract class Id3v2FrameHeader extends FrameHeader {
         return Id3v22FrameHeader.decode(header, bytes, startIndex);
     }
 
-    throw UnsupportedVersionException(header.version);
+    return null;
   }
-
-  Id3v2FrameHeader._decode(Id3Header header, List<int> bytes, int startIndex, FrameIdentifier identifier)
-      : super(identifier) {
-    decode(bytes, startIndex);
-  }
-
-  /// Decodes the Header
-  void decode(List<int> bytes, int startIndex);
 
   /// Encodes the header
   List<int> encode();
@@ -48,37 +44,19 @@ abstract class Id3v2FrameHeader extends FrameHeader {
     return '${identifier.frameName.name} | ${identifier.v24Name ?? identifier.v23Name ?? identifier.v22Name}';
   }
 
-  /*static FrameIdentifier decodeFrameIdentifier(Id3Header id3Header, List<int> bytes, int startIndex) {
-    FrameIdentifier? frameIdentifier;
-    String identifierId;
-
-    switch (id3Header.majorVersion) {
-      case 4:
-        identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 4));
-        frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v24Name == identifierId);
-        break;
-      case 3:
-        identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 4));
-        frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v23Name == identifierId);
-        break;
-      case 2:
-        identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 3));
-        frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v22Name == identifierId);
-        break;
-      default:
-        throw UnsupportedVersionException(id3Header.version);
-    }
-
-    if (frameIdentifier == null) {
-      throw UnsupportedFrameException(identifierId);
-    }
-
-    return frameIdentifier;
-  } */
+  /// Decodes the Header
+  void _internalDecode(List<int> bytes, int startIndex);
 }
 
 class Id3v24FrameHeader extends Id3v23FrameHeader {
-  factory Id3v24FrameHeader.decode(
+  Id3v24FrameHeader(
+    Id3v2Header id3v2Header,
+    List<int> bytes,
+    int startIndex,
+    FrameIdentifier identifier,
+  ) : super(id3v2Header, bytes, startIndex, identifier);
+
+  static Id3v24FrameHeader? decode(
     Id3v2Header id3v2Header,
     List<int> bytes,
     int startIndex,
@@ -87,18 +65,11 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
     FrameIdentifier? frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v24Name == identifierId);
 
     if (frameIdentifier == null) {
-      throw UnsupportedFrameException(identifierId);
+      return null;
     }
 
     return Id3v24FrameHeader(id3v2Header, bytes, startIndex, frameIdentifier);
   }
-
-  Id3v24FrameHeader(
-    Id3v2Header id3v2Header,
-    List<int> bytes,
-    int startIndex,
-    FrameIdentifier identifier,
-  ) : super(id3v2Header, bytes, startIndex, identifier);
 
   @override
   int decodeFrameSize(List<int> bytes, int startIndex) {
@@ -122,7 +93,14 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
 }
 
 class Id3v23FrameHeader extends Id3v2FrameHeader {
-  factory Id3v23FrameHeader.decode(
+  Id3v23FrameHeader(
+    Id3v2Header id3v2Header,
+    List<int> bytes,
+    int startIndex,
+    FrameIdentifier identifier,
+  ) : super._internalDecode(id3v2Header, bytes, startIndex, identifier);
+
+  static Id3v23FrameHeader? decode(
     Id3v2Header id3v2Header,
     List<int> bytes,
     int startIndex,
@@ -131,18 +109,11 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
     FrameIdentifier? frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v23Name == identifierId);
 
     if (frameIdentifier == null) {
-      throw UnsupportedFrameException(identifierId);
+      return null;
     }
 
     return Id3v23FrameHeader(id3v2Header, bytes, startIndex, frameIdentifier);
   }
-
-  Id3v23FrameHeader(
-    Id3v2Header id3v2Header,
-    List<int> bytes,
-    int startIndex,
-    FrameIdentifier identifier,
-  ) : super._decode(id3v2Header, bytes, startIndex, identifier);
 
   @override
   int get headerSize => 10;
@@ -159,7 +130,7 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
   List<int> get flags => _flags;
 
   @override
-  void decode(List<int> bytes, int startIndex) {
+  void _internalDecode(List<int> bytes, int startIndex) {
     contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
     _flags = _loadFlags(bytes, startIndex + identifierFieldSize + sizeFieldSize);
   }
@@ -189,27 +160,12 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
 }
 
 class Id3v22FrameHeader extends Id3v2FrameHeader {
-  factory Id3v22FrameHeader.decode(
-    Id3v2Header id3v2Header,
-    List<int> bytes,
-    int startIndex,
-  ) {
-    String identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 3));
-    FrameIdentifier? frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v22Name == identifierId);
-
-    if (frameIdentifier == null) {
-      throw UnsupportedFrameException(identifierId);
-    }
-
-    return Id3v22FrameHeader(id3v2Header, bytes, startIndex, frameIdentifier);
-  }
-
   Id3v22FrameHeader(
     Id3v2Header id3v2Header,
     List<int> bytes,
     int startIndex,
     FrameIdentifier identifier,
-  ) : super._decode(id3v2Header, bytes, startIndex, identifier);
+  ) : super._internalDecode(id3v2Header, bytes, startIndex, identifier);
 
   @override
   int get headerSize => 6;
@@ -220,14 +176,19 @@ class Id3v22FrameHeader extends Id3v2FrameHeader {
   @override
   int get sizeFieldSize => 3;
 
-  @override
-  void decode(List<int> bytes, int startIndex) {
-    contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
-  }
+  static Id3v22FrameHeader? decode(
+    Id3v2Header id3v2Header,
+    List<int> bytes,
+    int startIndex,
+  ) {
+    String identifierId = latin1.decode(bytes.sublist(startIndex, startIndex + 3));
+    FrameIdentifier? frameIdentifier = frameIdentifiers.firstWhereOrNull((element) => element.v22Name == identifierId);
 
-  @override
-  int decodeFrameSize(List<int> bytes, int startIndex) {
-    return SizeCalculator.sizeOf3(bytes.sublist(startIndex, startIndex + 3));
+    if (frameIdentifier == null) {
+      return null;
+    }
+
+    return Id3v22FrameHeader(id3v2Header, bytes, startIndex, frameIdentifier);
   }
 
   @override
@@ -239,7 +200,17 @@ class Id3v22FrameHeader extends Id3v2FrameHeader {
   }
 
   @override
+  int decodeFrameSize(List<int> bytes, int startIndex) {
+    return SizeCalculator.sizeOf3(bytes.sublist(startIndex, startIndex + 3));
+  }
+
+  @override
   List<int> encodeFrameSize(int frameSize) {
     return SizeCalculator.frameSizeIn3Bytes(frameSize);
+  }
+
+  @override
+  void _internalDecode(List<int> bytes, int startIndex) {
+    contentSize = decodeFrameSize(bytes, startIndex + identifierFieldSize);
   }
 }

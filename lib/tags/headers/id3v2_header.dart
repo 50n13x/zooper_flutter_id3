@@ -10,6 +10,8 @@ import 'package:zooper_flutter_id3/helpers/size_calculator.dart';
 import 'id3_header.dart';
 
 class Id3v2Header extends Id3Header with EquatableMixin {
+  static const String identifierText = 'ID3';
+
   late int _revisionVersion;
   late int _flags;
 
@@ -17,7 +19,7 @@ class Id3v2Header extends Id3Header with EquatableMixin {
   int get headerSize => 10;
 
   @override
-  String get identifier => 'ID3';
+  String get identifier => identifierText;
 
   @override
   String get version => '2.$majorVersion.$revisionVersion';
@@ -33,15 +35,22 @@ class Id3v2Header extends Id3Header with EquatableMixin {
   /// The size of all frames inclusive padding
   late int frameSize;
 
-  Id3v2Header(List<int> bytes, int startIndex) {
-    if (isValidHeader(bytes, startIndex) == false) {
-      throw TagNotFoundException(identifier);
+  static Id3v2Header? decode(List<int> bytes, int start) {
+    var identifierBytes = bytes.sublist(start, start + identifierText.length);
+    var parsedIdentifier = latin1.decode(identifierBytes);
+
+    if (parsedIdentifier != identifierText) {
+      return null;
     }
 
-    majorVersion = _decodeMajorVersion(bytes);
-    _revisionVersion = _decodeRevisionVersion(bytes);
-    _flags = _decodeFlags(bytes);
-    frameSize = _decodeSize(bytes);
+    return Id3v2Header._decode(bytes, start);
+  }
+
+  Id3v2Header._decode(List<int> bytes, int startIndex) {
+    majorVersion = _decodeMajorVersion(bytes, startIndex);
+    _revisionVersion = _decodeRevisionVersion(bytes, startIndex);
+    _flags = _decodeFlags(bytes, startIndex);
+    frameSize = _decodeSize(bytes, startIndex);
   }
 
   String readIdentifier(Uint8List bytes) {
@@ -55,20 +64,20 @@ class Id3v2Header extends Id3Header with EquatableMixin {
     return identifier;
   }
 
-  int _decodeMajorVersion(List<int> bytes) {
-    return bytes[3];
+  int _decodeMajorVersion(List<int> bytes, int start) {
+    return bytes[start + 3];
   }
 
-  int _decodeRevisionVersion(List<int> bytes) {
-    return bytes[4];
+  int _decodeRevisionVersion(List<int> bytes, int start) {
+    return bytes[start + 4];
   }
 
-  int _decodeFlags(List<int> bytes) {
-    return bytes[5];
+  int _decodeFlags(List<int> bytes, int start) {
+    return bytes[start + 5];
   }
 
-  int _decodeSize(List<int> bytes) {
-    return SizeCalculator.sizeOfSyncSafe(bytes.sublist(6, 10));
+  int _decodeSize(List<int> bytes, int start) {
+    return SizeCalculator.sizeOfSyncSafe(bytes.sublist(start + 6, start + 10));
   }
 
   List<int> _sublist(List<int> bytes, int start, int length) {

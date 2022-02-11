@@ -2,7 +2,6 @@ import 'package:zooper_flutter_id3/exceptions/unsupported_version_exception.dart
 import 'package:zooper_flutter_id3/frames/id3_frame.dart';
 import 'package:zooper_flutter_id3/frames/id3v2_frame.dart';
 import 'package:zooper_flutter_id3/tags/contents/id3_content.dart';
-import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3v2_header.dart';
 
 abstract class Id3v2Content extends Id3Content<Id3v2Frame> {
@@ -23,12 +22,11 @@ abstract class Id3v2Content extends Id3Content<Id3v2Frame> {
   }
 
   Id3v2Content._decode(Id3v2Header header, List<int> bytes, int startIndex, int size) {
-    bool hasNextFrame = true;
-
+    var hasNextFrame = true;
     var start = startIndex;
 
     while (hasNextFrame) {
-      var frame = _decodeFrame(header, bytes, start);
+      var frame = Id3v2Frame.decode(header, bytes, start);
 
       if (frame == null) {
         hasNextFrame = false;
@@ -65,14 +63,6 @@ abstract class Id3v2Content extends Id3Content<Id3v2Frame> {
       ...list,
       ...padding,
     ];
-  }
-
-  Id3v2Frame? _decodeFrame(Id3Header header, List<int> bytes, int start) {
-    try {
-      return Id3v2Frame.decode(header, bytes, start);
-    } catch (exception) {
-      return null;
-    }
   }
 
   int _getIndexOfPaddingEnd(List<int> bytes, int start) {

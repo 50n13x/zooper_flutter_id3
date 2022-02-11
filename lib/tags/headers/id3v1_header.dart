@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
-import 'package:zooper_flutter_id3/exceptions/tag_not_found_exception.dart';
 
 import 'id3_header.dart';
 
@@ -15,12 +14,17 @@ class Id3v1Header extends Id3Header with EquatableMixin {
   @override
   int get headerSize => 3;
 
-  Id3v1Header(List<int> bytes, int startIndex) {
-    if (isValidHeader(bytes, startIndex) == false) {
-      throw TagNotFoundException(identifier);
+  static Id3v1Header? decode(List<int> bytes, int startIndex) {
+    Id3v1Header header = Id3v1Header();
+
+    var identifierBytes = bytes.sublist(startIndex, startIndex + header.identifier.length);
+    var parsedIdentifier = latin1.decode(identifierBytes);
+
+    if (parsedIdentifier != header.identifier) {
+      return null;
     }
 
-    majorVersion = 1;
+    header.majorVersion = 1;
   }
 
   @override

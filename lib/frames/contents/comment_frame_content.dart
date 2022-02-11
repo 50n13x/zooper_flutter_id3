@@ -9,9 +9,7 @@ import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 
 import 'id3v2_frame_content.dart';
 
-class CommentFrameContent extends Id3v2FrameContent {
-  late CommentModel model;
-
+class CommentFrameContent extends Id3v2FrameContent<CommentModel> {
   CommentFrameContent.decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
@@ -19,11 +17,6 @@ class CommentFrameContent extends Id3v2FrameContent {
     int startIndex,
     int size,
   ) : super() {
-    decode(bytes, startIndex, size);
-  }
-
-  @override
-  void decode(List<int> bytes, int startIndex, int size) {
     var subBytes = bytes.sublist(startIndex, startIndex + size);
 
     // Get the encoding

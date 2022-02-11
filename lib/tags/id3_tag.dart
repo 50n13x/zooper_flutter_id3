@@ -19,7 +19,7 @@ abstract class Id3Tag<THeader extends Id3Header, TContent extends Id3Content, TF
   }
 
   TFrame? getFrameByName(FrameName name) {
-    return content.frames.firstWhereOrNull((element) => element.frameHeader.identifier.frameName == name) as TFrame;
+    return content.frames.firstWhereOrNull((element) => element.frameHeader.identifier.frameName == name) as TFrame?;
   }
 
   List<int> encode();

@@ -5,7 +5,13 @@ import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3v2_header.dart';
 
 class Id3v2Frame extends Id3Frame<Id3v2FrameHeader, Id3v2FrameContent> {
-  factory Id3v2Frame.decode(
+  const Id3v2Frame(
+    Id3Header header,
+    Id3v2FrameHeader frameHeader,
+    Id3v2FrameContent frameContent,
+  ) : super(frameHeader, frameContent);
+
+  static Id3v2Frame? decode(
     Id3Header header,
     List<int> bytes,
     int startIndex,
@@ -16,6 +22,8 @@ class Id3v2Frame extends Id3Frame<Id3v2FrameHeader, Id3v2FrameContent> {
       bytes,
       startIndex,
     );
+
+    if (frameHeader == null) return null;
 
     // Decode the content
     var frameContent = Id3v2FrameContent.decode(
@@ -28,12 +36,6 @@ class Id3v2Frame extends Id3Frame<Id3v2FrameHeader, Id3v2FrameContent> {
 
     return Id3v2Frame(header, frameHeader, frameContent);
   }
-
-  const Id3v2Frame(
-    Id3Header header,
-    Id3v2FrameHeader frameHeader,
-    Id3v2FrameContent frameContent,
-  ) : super(frameHeader, frameContent);
 
   @override
   List<int> encode() {

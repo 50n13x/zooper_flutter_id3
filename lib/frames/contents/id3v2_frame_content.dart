@@ -7,82 +7,57 @@ import 'package:zooper_flutter_id3/enums/frame_name.dart';
 import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
 import 'package:zooper_flutter_id3/frames/contents/ignored_frame_content.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
+import 'package:zooper_flutter_id3/frames/models/frame_content_model.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 
+import '../frame_type.dart';
 import 'comment_frame_content.dart';
 import 'text_frame_content.dart';
 
-abstract class Id3v2FrameContent extends FrameContent {
+abstract class Id3v2FrameContent<TModel extends FrameContentModel> extends FrameContent {
+  late TModel model;
+
   factory Id3v2FrameContent.decode(
       Id3Header header, Id3v2FrameHeader frameHeader, List<int> bytes, int startIndex, int size) {
-    switch (frameHeader.identifier.frameName) {
-      case FrameName.picture:
-        return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size);
-      case FrameName.comment:
-        return CommentFrameContent.decode(header, frameHeader, bytes, startIndex, size);
+    switch (frameHeader.identifier.frameType) {
+      case FrameType.custom:
+        switch (frameHeader.identifier.frameName) {
+          // TODO: Implement picture
+          case FrameName.picture:
+            return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size)
+                as Id3v2FrameContent<TModel>;
 
-      case FrameName.album:
-      case FrameName.BPM:
-      case FrameName.composer:
-      case FrameName.contentType:
-      case FrameName.copyright:
-      case FrameName.encodingTime:
-      case FrameName.playlistDelay:
-      case FrameName.originalReleaseTime:
-      case FrameName.recordingTime:
-      case FrameName.releaseTime:
-      case FrameName.taggingTime:
-      case FrameName.encodedBy:
-      case FrameName.lyricist:
-      case FrameName.fileType:
-      case FrameName.involvedPeople:
-      case FrameName.contentGroupDescription:
-      case FrameName.title:
-      case FrameName.subTitle:
-      case FrameName.initialKey:
-      case FrameName.language:
-      case FrameName.length:
-      case FrameName.musicianCredits:
-      case FrameName.mediaType:
-      case FrameName.mood:
-      case FrameName.originalAlbum:
-      case FrameName.originalFilename:
-      case FrameName.originalLyricist:
-      case FrameName.originalPerformer:
-      case FrameName.owner:
-      case FrameName.artist:
-      case FrameName.accompaniment:
-      case FrameName.conductor:
-      case FrameName.modifiedBy:
-      case FrameName.partOfSet:
-      case FrameName.producedNotice:
-      case FrameName.publisher:
-      case FrameName.track:
-      case FrameName.radioStation:
-      case FrameName.radioStationOwner:
-      case FrameName.albumSortOrder:
-      case FrameName.performerSortOrder:
-      case FrameName.titleSortOrder:
-      case FrameName.ISRC:
-      case FrameName.encodingSettings:
-      case FrameName.setSubtitle:
-      case FrameName.additionalInfo:
-      case FrameName.date:
-      case FrameName.time:
-      case FrameName.originalReleaseYear:
-      case FrameName.recordingDates:
-      case FrameName.size:
-      case FrameName.year:
-        return TextFrameContent.decode(header, frameHeader, bytes, startIndex, size);
-      default:
-        return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size);
+          case FrameName.comment:
+            return CommentFrameContent.decode(header, frameHeader, bytes, startIndex, size)
+                as Id3v2FrameContent<TModel>;
+
+          // TODO: Implement additional info
+          case FrameName.additionalInfo:
+            return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size)
+                as Id3v2FrameContent<TModel>;
+
+          default:
+            return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size)
+                as Id3v2FrameContent<TModel>;
+        }
+
+      case FrameType.text:
+        return TextFrameContent.decode(header, frameHeader, bytes, startIndex, size) as Id3v2FrameContent<TModel>;
+
+      case FrameType.url:
+        // TODO: Implement URL frames
+        return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size) as Id3v2FrameContent<TModel>;
+
+      case FrameType.other:
+        return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size) as Id3v2FrameContent<TModel>;
     }
   }
 
   Id3v2FrameContent();
 
-  Encoding getEncoding(int type) {
-    switch (type) {
+  /// Gets the [Encoding] by it's [typeId]
+  Encoding getEncoding(int typeId) {
+    switch (typeId) {
       case EncodingBytes.latin1:
         return latin1;
       case EncodingBytes.utf8:
@@ -96,6 +71,7 @@ abstract class Id3v2FrameContent extends FrameContent {
     }
   }
 
+  /// Gets the type id of the [Encoding] by the [type]
   int getIdFromEncoding(Encoding type) {
     switch (type.runtimeType) {
       case Latin1Codec:
