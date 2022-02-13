@@ -1,3 +1,3 @@
-## 0.0.1
+## 0.0.1-alpha
 
-* TODO: Describe initial release.
+Basic reading and writing of Frames
