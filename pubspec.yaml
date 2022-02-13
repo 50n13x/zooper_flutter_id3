@@ -1,7 +1,7 @@
 name: zooper_flutter_id3
-description: A new Flutter package project.
+description: The best library written in dart for reading and writing id3 tags
 version: 0.0.1-alpha
-homepage:
+homepage: https://github.com/zooper-lib
 
 environment:
   sdk: ">=2.15.1 <3.0.0"
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  convert: 3.0.1
+  convert: ^3.0.1
 
   collection: ^1.15.0
 
