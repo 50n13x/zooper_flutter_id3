@@ -3,9 +3,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+//import 'package:file_picker/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zooper_flutter_id3/enums/frame_name.dart';
 import 'package:zooper_flutter_id3/zooper_audiofile.dart';
 
 const String file1 = 'C:/Users/Danie/Desktop/1.mp3';
@@ -20,17 +20,23 @@ void main() {
   var emojiString = '🔥';
   var emojiBytes = <int>[0xFF, 0xFE, 0x3D, 0xD8, 0x25, 0xDD];
 
-  test('Loading file', () async {
-    //var filePath = await _pickFile();
-
+  test('Read and save file', () async {
     final bytes = await _loadBytesAsync(file3);
 
-    final ZooperAudioFile audioFile = ZooperAudioFile.decode(bytes);
-
-    debugPrint(audioFile.toString());
+    final audioFile = ZooperAudioFile.decode(bytes);
 
     var encoded = audioFile.encode();
     await saveFileAsync(encoded, 'test3');
+  });
+
+  test('Id3v2 contains frame', () async {
+    final bytes = await _loadBytesAsync(file3);
+
+    final audioFile = ZooperAudioFile.decode(bytes);
+
+    var containsFrame = audioFile.id3v2?.containsFrameWithIdentifier(FrameName.title);
+
+    expect(containsFrame, true);
   });
 }
 
@@ -46,7 +52,7 @@ Future<void> saveFileAsync(List<int> bytes, String name) async {
   await file.writeAsBytes(bytes);
 }
 
-Future<File> _pickFile() async {
+/*Future<File> _pickFile() async {
   FilePickerResult? result = await FilePicker.platform.pickFiles();
 
   if (result != null) {
@@ -55,3 +61,4 @@ Future<File> _pickFile() async {
     throw Exception('Error loading file');
   }
 }
+*/

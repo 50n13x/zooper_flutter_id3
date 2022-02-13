@@ -25,6 +25,8 @@ class Id3v1Header extends Id3Header with EquatableMixin {
     }
 
     header.majorVersion = 1;
+
+    return header;
   }
 
   @override
