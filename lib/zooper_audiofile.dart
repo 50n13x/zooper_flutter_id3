@@ -7,6 +7,7 @@ class ZooperAudioFile {
   Id3v2Tag? _id3v2tag;
   late AudioData _audioData;
 
+  /// Decodes a [List] of [int] to a [ZooperAudioFile]
   ZooperAudioFile.decode(List<int> bytes) {
     _id3v1tag = Id3v1Tag.decode(bytes);
     _id3v2tag = Id3v2Tag.decode(bytes, 0);
@@ -17,12 +18,23 @@ class ZooperAudioFile {
   Id3v2Tag? get id3v2 => _id3v2tag;
   AudioData get audioData => _audioData;
 
+  /// Enodes the [ZooperAudioFile] to a [List] of [int]
   List<int> encode() {
     return <int>[
       ...id3v2?.encode() ?? [],
       ...audioData.audioData,
       ...id3v1?.encode() ?? [],
     ];
+  }
+
+  /// Deletes the ID3v1 tag
+  void deleteId3v1Tag() {
+    _id3v1tag = null;
+  }
+
+  /// Deletes the ID3v2 tag
+  void deleteId3v2Tag() {
+    _id3v2tag = null;
   }
 
   AudioData _getAudioData(List<int> bytes, Id3v1Tag? v1, Id3v2Tag? v2) {

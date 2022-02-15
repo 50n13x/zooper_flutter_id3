@@ -56,5 +56,5 @@ final frame = audioFile.id3v2?.getFrameByNameOrNull(FrameName.track);
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=Q4QALYJXEDH5Q)
 
-[![paypal](images/yellow-button.png)](https://www.buymeacoffee.com/zooperlib)
+[!(images/yellow-button.png)](https://www.buymeacoffee.com/zooperlib)
 

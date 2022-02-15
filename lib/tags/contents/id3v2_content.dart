@@ -4,6 +4,11 @@ import 'package:zooper_flutter_id3/frames/id3v2_frame.dart';
 import 'package:zooper_flutter_id3/tags/contents/id3_content.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3v2_header.dart';
 
+import '../../enums/frame_name.dart';
+import '../../frames/contents/frame_content.dart';
+import '../../frames/headers/frame_header.dart';
+import '../../frames/models/frame_content_model.dart';
+
 abstract class Id3v2Content extends Id3Content<Id3v2Frame> {
   factory Id3v2Content.decode(
     Id3v2Header header,
@@ -63,6 +68,16 @@ abstract class Id3v2Content extends Id3Content<Id3v2Frame> {
       ...list,
       ...padding,
     ];
+  }
+
+  @override
+  void deleteFrame(Id3Frame<FrameHeader, FrameContent<FrameContentModel>> frame) {
+    frames.remove(frame);
+  }
+
+  @override
+  void deleteFramesByName(FrameName frameName) {
+    frames.removeWhere((element) => element.frameHeader.identifier.frameName == frameName);
   }
 
   int _getIndexOfPaddingEnd(List<int> bytes, int start) {
