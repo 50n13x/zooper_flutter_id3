@@ -16,27 +16,102 @@ const String file5 = 'C:/Users/Danie/Desktop/5.mp3';
 const String file6 = 'C:/Users/Danie/Desktop/6.mp3';
 const String file7 = 'C:/Users/Danie/Desktop/star_test.mp3';
 
-void main() {
+void main() async {
   var emojiString = '🔥';
   var emojiBytes = <int>[0xFF, 0xFE, 0x3D, 0xD8, 0x25, 0xDD];
 
-  test('Read and save file', () async {
+  late ZooperAudioFile audioFile;
+
+  test('Decode file', () async {
     final bytes = await _loadBytesAsync(file3);
-
-    final audioFile = ZooperAudioFile.decode(bytes);
-
-    var encoded = audioFile.encode();
-    await saveFileAsync(encoded, 'test3');
+    audioFile = ZooperAudioFile.decode(bytes);
   });
 
   test('Id3v2 contains frame', () async {
-    final bytes = await _loadBytesAsync(file3);
-
-    final audioFile = ZooperAudioFile.decode(bytes);
-
-    var containsFrame = audioFile.id3v2?.containsFrameWithIdentifier(FrameName.title);
+    final containsFrame = audioFile.id3v2?.containsFrameWithIdentifier(FrameName.title);
 
     expect(containsFrame, true);
+  });
+
+  test('Get frames as Map', () async {
+    final frameMap = audioFile.id3v2?.getFramesAsMultimap();
+  });
+
+  test('Get ContentModels by FrameName', () async {
+    final models = audioFile.id3v2?.getContentModelsByFrameName(FrameName.GEOB);
+  });
+
+  test('Delete ID3v2 GEOB Frame', () async {
+    audioFile.id3v2?.deleteFramesByName(FrameName.GEOB);
+  });
+
+  test('Get Id3v2 ContentGroupDescription', () async {
+    var frameContent = audioFile.id3v2?.getContentGroupDescriptionModel();
+
+    if (frameContent == null) {
+      return;
+    }
+
+    expect(frameContent.value, '🌟🌟🌟');
+  });
+
+  test('Get Id3v2 BPM', () async {
+    var frameContent = audioFile.id3v2?.getBPMModel();
+
+    if (frameContent == null) {
+      return;
+    }
+
+    expect(frameContent.value, '88');
+  });
+
+  test('Change ID3v2 Artist', () async {
+    var frameContent = audioFile.id3v2?.getArtistModel();
+
+    if (frameContent == null) {
+      return;
+    }
+
+    frameContent.value = 'Billy Blue';
+  });
+
+  /*test('Delete all v2 frames', () async {
+    audioFile.deleteId3v2Tag();
+  }); */
+
+  test('Delete ID3v2 Artist Frame', () async {
+    audioFile.id3v2?.deleteFramesByName(FrameName.artist);
+  });
+
+  test('Add Id3v2 Artist', () async {
+    audioFile.id3v2?.addArtist('This is an artist test');
+  });
+
+  /*test('Get APIC Frame', () async {
+    var frames = audioFile.id3v2?.getContentModelsByFrameName(FrameName.picture);
+
+    if (frames == null) {
+      return;
+    }
+
+    for (var frame in frames) {
+      var description = (frame as AttachedPictureModel).pictureType.name;
+
+      var mimeType = (frame).mimeType;
+
+      var fileTypeIndex = mimeType.indexOf('/');
+      var fileType = mimeType.substring(fileTypeIndex + 1);
+
+      var pictureData = (frame).imageData;
+
+      File file = File('C:/Users/Danie/Desktop/$description.$fileType');
+      await file.writeAsBytes(pictureData);
+    }
+  }); */
+
+  test('Save file', () async {
+    var encoded = audioFile.encode();
+    await saveFileAsync(encoded, 'test3');
   });
 }
 

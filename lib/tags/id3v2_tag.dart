@@ -1,7 +1,16 @@
+import 'package:collection/collection.dart';
+import 'package:zooper_flutter_id3/enums/picture_type.dart';
+import 'package:zooper_flutter_id3/frames/contents/text_frame_content.dart';
+import 'package:zooper_flutter_id3/frames/frame_identifiers.dart';
+import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
 import 'package:zooper_flutter_id3/frames/id3v2_frame.dart';
+import 'package:zooper_flutter_id3/frames/models/attached_picture_model.dart';
 import 'package:zooper_flutter_id3/tags/contents/id3v2_content.dart';
 import 'package:zooper_flutter_id3/tags/id3_tag.dart';
 
+import '../enums/frame_name.dart';
+import '../frames/models/text_model.dart';
+import '../helpers/encoding_helper.dart';
 import 'headers/id3v2_header.dart';
 
 class Id3v2Tag extends Id3Tag<Id3v2Header, Id3v2Content, Id3v2Frame> {
@@ -32,6 +41,11 @@ class Id3v2Tag extends Id3Tag<Id3v2Header, Id3v2Content, Id3v2Frame> {
 
   @override
   List<int> encode() {
+    // Don't encode if no frame is present
+    if (content.frames.isEmpty) {
+      return <int>[];
+    }
+
     var frameBytes = content.encode();
 
     header.frameSize = frameBytes.length;
@@ -41,5 +55,67 @@ class Id3v2Tag extends Id3Tag<Id3v2Header, Id3v2Content, Id3v2Frame> {
       ...headerBytes,
       ...frameBytes,
     ];
+  }
+
+  TextModel? getArtistModel() => getFramesByName(FrameName.artist).firstOrNull?.frameContent.model as TextModel?;
+
+  TextModel? getTitleModel() => getFramesByName(FrameName.title).firstOrNull?.frameContent.model as TextModel?;
+
+  TextModel? getAlbumModel() => getFramesByName(FrameName.album).firstOrNull?.frameContent.model as TextModel?;
+
+  TextModel? getGenreModel() => getFramesByName(FrameName.contentType).firstOrNull?.frameContent.model as TextModel?;
+
+// TODO: Change this to an numeric Frame
+  TextModel? getBPMModel() => getFramesByName(FrameName.BPM).firstOrNull?.frameContent.model as TextModel?;
+
+  TextModel? getCommentModel() => getFramesByName(FrameName.comment).firstOrNull?.frameContent.model as TextModel?;
+
+  TextModel? getContentGroupDescriptionModel() =>
+      getFramesByName(FrameName.contentGroupDescription).firstOrNull?.frameContent.model as TextModel?;
+
+  List<AttachedPictureModel> getAttachedPictures() {
+    List<AttachedPictureModel> models = [];
+
+    var frames = getFramesByName(FrameName.picture);
+
+    for (var frame in frames) {
+      models.add(frame.frameContent.model as AttachedPictureModel);
+    }
+
+    return models;
+  }
+
+  AttachedPictureModel? getAttachedPictureByType(PictureType type) {
+    var pictures = getAttachedPictures();
+
+    return pictures.firstWhereOrNull((element) => element.pictureType == type);
+  }
+
+  void addArtist(String content, [int encodingType = 2]) => _addTextFrame(content, FrameName.artist, encodingType);
+
+  void addTitle(String content, [int encodingType = 2]) => _addTextFrame(content, FrameName.title, encodingType);
+
+  void addAlbum(String content, [int encodingType = 2]) => _addTextFrame(content, FrameName.album, encodingType);
+
+// TODO: Change this to an numeric Frame
+  void addGenre(String content, [int encodingType = 2]) => _addTextFrame(content, FrameName.contentType, encodingType);
+
+  void addBPM(String content, [int encodingType = 2]) => _addTextFrame(content, FrameName.BPM, encodingType);
+
+  void addComment(String content, [int encodingType = 2]) => _addTextFrame(content, FrameName.comment, encodingType);
+
+  void addContentGroupDescription(String content, [int encodingType = 2]) =>
+      _addTextFrame(content, FrameName.contentGroupDescription, encodingType);
+
+  void _addTextFrame(String content, FrameName frameName, int encodingType) {
+    var identifier = frameIdentifiers.firstWhere((element) => element.frameName == frameName);
+    var frameHeader = Id3v2FrameHeader.create(header, identifier);
+
+    var contentModel = Id3v2TextModel(getEncoding(encodingType), content);
+    var frameContent = TextFrameContent.create(header, contentModel);
+
+    var frame = Id3v2Frame(header, frameHeader, frameContent);
+
+    addFrame(frame);
   }
 }

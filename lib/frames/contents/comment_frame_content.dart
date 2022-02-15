@@ -7,16 +7,17 @@ import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
 import 'package:zooper_flutter_id3/frames/models/comment_model.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
 
-import 'id3v2_frame_content.dart';
+import '../../helpers/encoding_helper.dart';
+import 'frame_content.dart';
 
-class CommentFrameContent extends Id3v2FrameContent<CommentModel> {
-  CommentFrameContent.decode(
+class CommentFrameContent extends FrameContent<CommentModel> {
+  factory CommentFrameContent.decode(
     Id3Header header,
     Id3v2FrameHeader frameHeader,
     List<int> bytes,
     int startIndex,
     int size,
-  ) : super() {
+  ) {
     var subBytes = bytes.sublist(startIndex, startIndex + size);
 
     // Get the encoding
@@ -30,10 +31,14 @@ class CommentFrameContent extends Id3v2FrameContent<CommentModel> {
 
     final offset = splitIndex + (encoding is UTF16 ? 2 : 1);
 
-    var body = decodeBody(subBytes, offset, encoding);
+    var body = _decodeBody(subBytes, offset, encoding);
 
-    model = CommentModel(encoding, language, description, body);
+    var model = CommentModel(encoding, language, description, body);
+
+    return CommentFrameContent(model);
   }
+
+  CommentFrameContent(CommentModel model) : super(model);
 
   @override
   List<int> encode() {
@@ -46,20 +51,20 @@ class CommentFrameContent extends Id3v2FrameContent<CommentModel> {
     ];
   }
 
-  String _decodeLanguage(List<int> bytes, int startIndex, int length) {
+  static String _decodeLanguage(List<int> bytes, int startIndex, int length) {
     return latin1.decode(bytes.sublist(startIndex, startIndex + length));
   }
 
-  String _decodeDescription(List<int> bytes, int startIndex, int endIndex, Encoding encoding) {
+  static String _decodeDescription(List<int> bytes, int startIndex, int endIndex, Encoding encoding) {
     return endIndex < 0 ? '' : encoding.decode(bytes.sublist(startIndex, endIndex));
   }
 
-  String decodeBody(List<int> bytes, int startIndex, Encoding encoding) {
+  static String _decodeBody(List<int> bytes, int startIndex, Encoding encoding) {
     final bodyBytes = bytes.sublist(startIndex);
     return encoding.decode(bodyBytes);
   }
 
-  int _indexOfSplitPattern(List<int> list, List<int> pattern, [int initialOffset = 0]) {
+  static int _indexOfSplitPattern(List<int> list, List<int> pattern, [int initialOffset = 0]) {
     for (var i = initialOffset; i < list.length - pattern.length; i += pattern.length) {
       final l = list.sublist(i, i + pattern.length);
       if (const collection.ListEquality().equals(l, pattern)) {

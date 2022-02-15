@@ -5,7 +5,7 @@ import 'package:zooper_flutter_id3/frames/frame_type.dart';
 final List<FrameIdentifier> frameIdentifiers = [
   // A
   FrameIdentifier(FrameName.encryption, 0, 0, 'CRA', 'AENC', 'AENC', FrameType.other),
-  FrameIdentifier(FrameName.picture, 0, 0, 'PIC', 'APIC', 'APIC', FrameType.other),
+  FrameIdentifier(FrameName.picture, 0, 0, 'PIC', 'APIC', 'APIC', FrameType.custom),
   FrameIdentifier(FrameName.audioSeekPointIndex, 0, 0, null, null, 'ASPI', FrameType.other),
 
   // C

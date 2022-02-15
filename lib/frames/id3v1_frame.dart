@@ -1,5 +1,5 @@
 import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
-import 'package:zooper_flutter_id3/frames/contents/id3v1_frame_content.dart';
+import 'package:zooper_flutter_id3/frames/contents/id3v1_frame_content_factory.dart';
 import 'package:zooper_flutter_id3/frames/frame_identifier.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v1_frame_header.dart';
 import 'package:zooper_flutter_id3/tags/headers/id3_header.dart';
@@ -13,7 +13,7 @@ class Id3v1Frame<T> extends Id3Frame {
     var frameHeader = Id3v1FrameHeader(identifier);
 
     // Decode the content
-    var frameContent = Id3v1FrameContent.decode(
+    var frameContent = Id3v1FrameContentFactory.decode(
       header,
       frameHeader,
       bytes,
