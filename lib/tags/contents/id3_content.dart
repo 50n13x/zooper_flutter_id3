@@ -73,7 +73,7 @@ abstract class Id3Content<TFrame extends Id3Frame> {
       throw FramePresentException(frame.frameHeader.identifier.frameName.name);
     }
 
-    _frames.add(frame);
+    _frames.insert(0, frame);
   }
 
   /// Deletes a specific frame

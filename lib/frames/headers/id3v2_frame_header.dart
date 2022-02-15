@@ -76,7 +76,7 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
   }
 
   factory Id3v24FrameHeader.create(FrameIdentifier identifier) {
-    return Id3v24FrameHeader(identifier, 0, <int>[]);
+    return Id3v24FrameHeader(identifier, 0, <int>[0, 0]);
   }
 
   @override
@@ -126,7 +126,7 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
   }
 
   factory Id3v23FrameHeader.create(FrameIdentifier identifier) {
-    return Id3v23FrameHeader(identifier, 0, <int>[]);
+    return Id3v23FrameHeader(identifier, 0, <int>[0, 0]);
   }
 
   Id3v23FrameHeader(FrameIdentifier id, int size, List<int> flags) : super(id) {
@@ -149,7 +149,7 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
   }
 
   static int _decodeFrameSize(List<int> bytes, int startIndex) {
-    return SizeCalculator.sizeOf(bytes.sublist(startIndex, startIndex + 4));
+    return SizeCalculator.sizeOfSyncSafe(bytes.sublist(startIndex, startIndex + 4));
   }
 
   static List<int> _loadFlags(List<int> bytes, int startIndex, int flagsFieldSize) {

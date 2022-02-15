@@ -1,4 +1,5 @@
 import 'package:zooper_flutter_id3/enums/frame_name.dart';
+import 'package:zooper_flutter_id3/frames/contents/attached_picture_frame_content.dart';
 import 'package:zooper_flutter_id3/frames/contents/frame_content.dart';
 import 'package:zooper_flutter_id3/frames/contents/ignored_frame_content.dart';
 import 'package:zooper_flutter_id3/frames/headers/id3v2_frame_header.dart';
@@ -14,9 +15,8 @@ class Id3v2FrameContentFactory {
     switch (frameHeader.identifier.frameType) {
       case FrameType.custom:
         switch (frameHeader.identifier.frameName) {
-          // TODO: Implement picture
           case FrameName.picture:
-            return IgnoredFrameContent.decode(header, frameHeader, bytes, startIndex, size);
+            return AttachedPictureFrameContent.decode(header, frameHeader, bytes, startIndex, size);
 
           case FrameName.comment:
             return CommentFrameContent.decode(header, frameHeader, bytes, startIndex, size);
