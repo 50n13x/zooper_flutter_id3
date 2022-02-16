@@ -69,8 +69,8 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
       return null;
     }
 
-    var contentSize = Id3v23FrameHeader._decodeFrameSize(bytes, startIndex + identifierFieldSize);
-    var flags = Id3v23FrameHeader._loadFlags(bytes, startIndex + identifierFieldSize + sizeFieldSize, flagsFieldSize);
+    var contentSize = _decodeFrameSize(bytes, startIndex + identifierFieldSize);
+    var flags = _loadFlags(bytes, startIndex + identifierFieldSize + sizeFieldSize, flagsFieldSize);
 
     return Id3v24FrameHeader(frameIdentifier, contentSize, flags);
   }
@@ -92,6 +92,14 @@ class Id3v24FrameHeader extends Id3v23FrameHeader {
   @override
   List<int> encodeFrameSize(int frameSize) {
     return SizeCalculator.frameSizeInSynchSafeBytes(frameSize);
+  }
+
+  static int _decodeFrameSize(List<int> bytes, int startIndex) {
+    return SizeCalculator.sizeOfSyncSafe(bytes.sublist(startIndex, startIndex + 4));
+  }
+
+  static List<int> _loadFlags(List<int> bytes, int startIndex, int flagsFieldSize) {
+    return bytes.sublist(startIndex, startIndex + flagsFieldSize);
   }
 }
 
@@ -149,7 +157,7 @@ class Id3v23FrameHeader extends Id3v2FrameHeader {
   }
 
   static int _decodeFrameSize(List<int> bytes, int startIndex) {
-    return SizeCalculator.sizeOfSyncSafe(bytes.sublist(startIndex, startIndex + 4));
+    return SizeCalculator.sizeOf(bytes.sublist(startIndex, startIndex + 4));
   }
 
   static List<int> _loadFlags(List<int> bytes, int startIndex, int flagsFieldSize) {
