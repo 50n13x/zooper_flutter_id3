@@ -1,6 +1,6 @@
 name: zooper_flutter_id3
 description: The best library written in dart for reading and writing id3 tags
-version: 0.0.2-alpha
+version: 0.0.3-alpha
 homepage: https://github.com/zooper-lib/zooper_flutter_id3
 
 environment:
