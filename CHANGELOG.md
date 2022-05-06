@@ -11,3 +11,7 @@ Basic reading and writing of Frames
 ## 0.0.3-alpha
 
 - Fixed a bug where the ID3v2.3 frame size were read falsely
+
+## 0.0.4-alpha
+
+- Fixed a bug where the frames content could not be read correctly if the content was less or equal than 1 Byte
