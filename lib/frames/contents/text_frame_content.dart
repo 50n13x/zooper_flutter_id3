@@ -59,8 +59,20 @@ class Id3v2TextFrameContent extends TextFrameContent<Id3v2TextModel> {
   ) {
     var sublist = bytes.sublist(startIndex, startIndex + size);
 
+    // Handle no content
+    if (sublist.isEmpty) {
+      var model = Id3v2TextModel(getEncoding(0), '');
+      return Id3v2TextFrameContent(model);
+    }
+
     // Get the encoding
     var encoding = getEncoding(sublist[0]);
+
+    // If there is no content or termination
+    if (sublist.length == 1) {
+      var model = Id3v2TextModel(encoding, '');
+      return Id3v2TextFrameContent(model);
+    }
 
     var termination = Terminations.getByEncoding(encoding);
     bool hasTermination = Terminations.hasTermination(

@@ -15,6 +15,7 @@ const String file4 = 'C:/Users/Danie/Desktop/4.mp4';
 const String file5 = 'C:/Users/Danie/Desktop/5.mp3';
 const String file6 = 'C:/Users/Danie/Desktop/6.mp3';
 const String file7 = 'C:/Users/Danie/Desktop/7.mp3';
+const String file8 = 'C:/Users/Danie/Desktop/8.mp3';
 
 void main() async {
   var emojiString = '🔥';
@@ -23,7 +24,7 @@ void main() async {
   late ZooperAudioFile audioFile;
 
   test('Decode file', () async {
-    final bytes = await _loadBytesAsync(file2);
+    final bytes = await _loadBytesAsync(file8);
     audioFile = ZooperAudioFile.decode(bytes);
   });
 
