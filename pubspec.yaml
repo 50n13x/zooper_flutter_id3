@@ -21,8 +21,9 @@ dependencies:
 
   quiver: ^3.0.1+1
 
-  zooper_flutter_encoding_utf16: ^0.0.1
-
+  zooper_flutter_encoding_utf16:
+    git:
+      url: https://github.com/50n13x/zooper_flutter_encoding_utf16
 dev_dependencies:
   flutter_test:
     sdk: flutter
